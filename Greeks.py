@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 import sympy as sp
+import networkx as nx
 
 # Configuración de la página
 st.set_page_config(
