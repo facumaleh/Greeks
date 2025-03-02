@@ -99,17 +99,17 @@ with tab1:
 
     # Entrada de la función
     st.header("⚙️ Ingresa una función")
-    function_input = st.text_input("Ingresa una función de x (por ejemplo, sin(x), exp(x), x**2):", "sin(x)")
+    function_input = st.text_input("Ingresa una función de x (por ejemplo, sin(x), exp(x), x**2):", "sin(x)", key="taylor_function_input")
 
     # Configuración del gráfico
     st.header("⚙️ Configuración del gráfico")
     col1, col2, col3 = st.columns(3)
     with col1:
-        x0 = st.slider("Punto de expansión (x0)", -15.0, 15.0, 0.01, 0.1, help="Punto alrededor del cual se calculará la expansión de Taylor.")
+        x0 = st.slider("Punto de expansión (x0)", -15.0, 15.0, 0.01, 0.1, help="Punto alrededor del cual se calculará la expansión de Taylor.", key="taylor_x0")
     with col2:
-        x_min = st.slider("Límite inferior de x", -15.0, 15.0, -5.0, 0.1, help="Valor mínimo de x para el gráfico.")
+        x_min = st.slider("Límite inferior de x", -15.0, 15.0, -5.0, 0.1, help="Valor mínimo de x para el gráfico.", key="taylor_x_min")
     with col3:
-        x_max = st.slider("Límite superior de x", -15.0, 15.0, 5.0, 0.1, help="Valor máximo de x para el gráfico.")
+        x_max = st.slider("Límite superior de x", -15.0, 15.0, 5.0, 0.1, help="Valor máximo de x para el gráfico.", key="taylor_x_max")
 
     # Definir la variable simbólica
     x = sp.symbols('x')
@@ -180,13 +180,13 @@ with tab2:
     st.header("⚙️ Parámetros del Modelo")
     col1, col2 = st.columns(2)
     with col1:
-        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01)
-        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01)
-        U = st.number_input("Factor de Subida (U)", value=1.1, min_value=1.0)
+        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01, key="binomial_S")
+        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01, key="binomial_K")
+        U = st.number_input("Factor de Subida (U)", value=1.1, min_value=1.0, key="binomial_U")
     with col2:
-        D = st.number_input("Factor de Bajada (D)", value=0.9, max_value=1.0)
-        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.05, min_value=1.0)
-        periods = st.number_input("Número de Periodos", value=3, min_value=1)
+        D = st.number_input("Factor de Bajada (D)", value=0.9, max_value=1.0, key="binomial_D")
+        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.05, min_value=1.0, key="binomial_R")
+        periods = st.number_input("Número de Periodos", value=3, min_value=1, key="binomial_periods")
 
     # Función para calcular el precio de la opción call usando árbol binomial
     def binomial_tree_call(S, K, U, D, R, periods):
@@ -288,17 +288,17 @@ with tab3:
     st.header("⚙️ Parámetros de la Opción")
     col1, col2, col3 = st.columns(3)
     with col1:
-        S = st.slider("Precio del Activo (S)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.")
+        S = st.slider("Precio del Activo (S)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="black_scholes_S")
     with col2:
-        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.")
+        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="black_scholes_K")
     with col3:
-        T = st.slider("Tiempo hasta vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.")
+        T = st.slider("Tiempo hasta vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="black_scholes_T")
 
     col4, col5 = st.columns(2)
     with col4:
-        r = st.slider("Tasa libre de riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.")
+        r = st.slider("Tasa libre de riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="black_scholes_r")
     with col5:
-        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.")
+        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="black_scholes_sigma")
 
     # Fórmula de Black-Scholes para una opción call
     def black_scholes_call(S, K, T, r, sigma):
@@ -416,17 +416,17 @@ with tab4:
     with st.expander("⚙️ Parámetros de la Opción"):
         col1, col2, col3 = st.columns(3)
         with col1:
-            S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.")
+            S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="taylor_S0")
         with col2:
-            K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.")
+            K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="taylor_K")
         with col3:
-            T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.")
+            T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="taylor_T")
 
         col4, col5 = st.columns(2)
         with col4:
-            r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.")
+            r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="taylor_r")
         with col5:
-            sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.")
+            sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="taylor_sigma")
 
     # Calcular el precio de la opción call usando Black-Scholes
     def black_scholes_call(S, K, T, r, sigma):
