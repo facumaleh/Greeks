@@ -5,14 +5,47 @@ from scipy.stats import norm
 import sympy as sp
 
 # Configurar la aplicación en pantalla completa
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title="Visualizador de Black-Scholes y Taylor")
 
-# Usar pestañas para la navegación
-tab1, tab2 = st.tabs(["Black-Scholes", "Aproximación de Taylor"])
+# Tema oscuro (opcional)
+st.markdown("""
+<style>
+.stApp {
+    background-color: #1E1E1E;
+    color: #FFFFFF;
+}
+.stSlider>div>div>div>div {
+    background-color: #4CAF50;
+}
+.st-bb {
+    background-color: transparent;
+}
+.st-at {
+    background-color: transparent;
+}
+.css-1d391kg {
+    background-color: #1E1E1E;
+}
+</style>
+""", unsafe_allow_html=True)
 
-with tab1:
-    # Código de la página de Black-Scholes
+# Menú de navegación lateral
+st.sidebar.title("Navegación")
+menu = st.sidebar.radio("Selecciona una página", ["Black-Scholes", "Aproximación de Taylor"])
+
+# Página de Black-Scholes
+if menu == "Black-Scholes":
     st.title("📊 Visualizador de Letras Griegas en Black-Scholes")
+
+    # Descripción de las letras griegas
+    st.markdown("""
+    **Letras Griegas:**
+    - **Delta (Δ):** Sensibilidad del precio de la opción respecto al precio del activo subyacente.
+    - **Gamma (Γ):** Sensibilidad de Delta respecto al precio del activo.
+    - **Theta (Θ):** Sensibilidad del precio de la opción respecto al tiempo.
+    - **Vega (ν):** Sensibilidad del precio de la opción respecto a la volatilidad.
+    - **Rho (ρ):** Sensibilidad del precio de la opción respecto a la tasa de interés.
+    """)
 
     # Controles en dos filas
     st.header("⚙️ Parámetros de la Opción")
@@ -127,18 +160,15 @@ with tab1:
     plt.tight_layout()
     st.pyplot(fig)
 
-with tab2:
-    # Código de la página de Aproximación de Taylor
+# Página de Aproximación de Taylor
+elif menu == "Aproximación de Taylor":
     st.title("📈 Aproximación de Taylor")
 
-    # Ejemplos de funciones
+    # Descripción de la expansión de Taylor
     st.markdown("""
-    **Ejemplos de funciones que puedes usar:**
-    - `sin(x)`
-    - `cos(x)`
-    - `exp(x)`
-    - `log(x)`
-    - `x**2 + 2*x + 1`
+    **Expansión de Taylor:**
+    - La expansión de Taylor permite aproximar una función alrededor de un punto \( x_0 \).
+    - Aquí puedes calcular las expansiones de Taylor de grado 1 y grado 2 para cualquier función.
     """)
 
     # Entrada de la función
@@ -236,6 +266,5 @@ with tab2:
 st.markdown("---")
 st.markdown("""
 **Creado por:** Facundo Maleh  
-
 **Nota:** Esta aplicación es solo para fines educativos.
 """)
