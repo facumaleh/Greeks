@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 # Configuración de la página (DEBE SER LA PRIMERA LÍNEA DE STREAMLIT)
 st.set_page_config(
     layout="wide",
-    page_title="Visualizador de Black-Scholes, Taylor y Binomial",
+    page_title="Visualizador de Opciones Financieras",
     page_icon="📊"
 )
 
@@ -73,150 +73,21 @@ def apply_theme():
         """, unsafe_allow_html=True)
 
 # Selección de tema en el cuerpo principal
-st.title("Visualizador de Black-Scholes, Taylor y Binomial")
+st.title("Visualizador de Opciones Financieras")
 theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
 apply_theme()
 
 # Menú de navegación con pestañas
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📈 Black-Scholes", 
     "📊 Aproximación de Taylor", 
     "🌳 Árbol Binomial", 
+    "📈 Black-Scholes", 
     "📉 Expansión de Taylor para Call"
 ])
-# Página de Black-Scholes
-with tab1:
-    st.title("📊 Visualizador de Letras Griegas en Black-Scholes")
-
-    # Descripción de las letras griegas
-    with st.expander("📚 ¿Qué son las Letras Griegas?"):
-        st.markdown("""
-        **Letras Griegas:**
-        - **Delta (Δ):** Sensibilidad del precio de la opción respecto al precio del activo subyacente.
-        - **Gamma (Γ):** Sensibilidad de Delta respecto al precio del activo.
-        - **Theta (Θ):** Sensibilidad del precio de la opción respecto al tiempo.
-        - **Vega (ν):** Sensibilidad del precio de la opción respecto a la volatilidad.
-        - **Rho (ρ):** Sensibilidad del precio de la opción respecto a la tasa de interés.
-        """)
-
-    # Controles en la parte superior
-    with st.expander("⚙️ Parámetros de la Opción"):
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            S = st.slider("Precio del Activo (S)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.")
-        with col2:
-            K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.")
-        with col3:
-            T = st.slider("Tiempo hasta vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.")
-
-        col4, col5 = st.columns(2)
-        with col4:
-            r = st.slider("Tasa libre de riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.")
-        with col5:
-            sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.")
-
-    # Fórmula de Black-Scholes para una opción call
-    def black_scholes_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        d2 = d1 - sigma * np.sqrt(T)
-        call_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
-        return call_price
-
-    # Calcular el precio de la opción call
-    call_price = black_scholes_call(S, K, T, r, sigma)
-
-    # Cálculo de las letras griegas
-    def delta_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        return norm.cdf(d1)
-
-    def gamma_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        return norm.pdf(d1) / (S * sigma * np.sqrt(T))
-
-    def theta_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        d2 = d1 - sigma * np.sqrt(T)
-        return - (S * norm.pdf(d1) * sigma) / (2 * np.sqrt(T)) - r * K * np.exp(-r * T) * norm.cdf(d2)
-
-    def vega_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        return S * norm.pdf(d1) * np.sqrt(T)
-
-    def rho_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        d2 = d1 - sigma * np.sqrt(T)
-        return K * T * np.exp(-r * T) * norm.cdf(d2)
-
-    # Calcular las letras griegas
-    delta = delta_call(S, K, T, r, sigma)
-    gamma = gamma_call(S, K, T, r, sigma)
-    theta = theta_call(S, K, T, r, sigma)
-    vega = vega_call(S, K, T, r, sigma)
-    rho = rho_call(S, K, T, r, sigma)
-
-    # Gráficos de las letras griegas con Plotly
-    st.subheader("📊 Gráficas de las Letras Griegas")
-    S_range = np.linspace(1, 200, 100)
-    delta_values = delta_call(S_range, K, T, r, sigma)
-    gamma_values = gamma_call(S_range, K, T, r, sigma)
-    theta_values = theta_call(S_range, K, T, r, sigma)
-    vega_values = vega_call(S_range, K, T, r, sigma)
-    rho_values = rho_call(S_range, K, T, r, sigma)
-
-    # Crear gráficos interactivos
-    fig_delta = go.Figure()
-    fig_delta.add_trace(go.Scatter(x=S_range, y=delta_values, mode='lines', name='Delta', line=dict(color='blue')))
-    fig_delta.update_layout(title="Δ Delta", xaxis_title="Precio del Activo (S)", yaxis_title="Delta", template="plotly_dark" if theme == "dark" else "plotly_white")
-
-    fig_gamma = go.Figure()
-    fig_gamma.add_trace(go.Scatter(x=S_range, y=gamma_values, mode='lines', name='Gamma', line=dict(color='orange')))
-    fig_gamma.update_layout(title="Γ Gamma", xaxis_title="Precio del Activo (S)", yaxis_title="Gamma", template="plotly_dark" if theme == "dark" else "plotly_white")
-
-    fig_theta = go.Figure()
-    fig_theta.add_trace(go.Scatter(x=S_range, y=theta_values, mode='lines', name='Theta', line=dict(color='green')))
-    fig_theta.update_layout(title="Θ Theta", xaxis_title="Precio del Activo (S)", yaxis_title="Theta", template="plotly_dark" if theme == "dark" else "plotly_white")
-
-    fig_vega = go.Figure()
-    fig_vega.add_trace(go.Scatter(x=S_range, y=vega_values, mode='lines', name='Vega', line=dict(color='red')))
-    fig_vega.update_layout(title="ν Vega", xaxis_title="Precio del Activo (S)", yaxis_title="Vega", template="plotly_dark" if theme == "dark" else "plotly_white")
-
-    fig_rho = go.Figure()
-    fig_rho.add_trace(go.Scatter(x=S_range, y=rho_values, mode='lines', name='Rho', line=dict(color='purple')))
-    fig_rho.update_layout(title="ρ Rho", xaxis_title="Precio del Activo (S)", yaxis_title="Rho", template="plotly_dark" if theme == "dark" else "plotly_white")
-
-    # Mostrar gráficos en columnas
-    col1, col2, col3, col4, col5 = st.columns(5)
-    with col1:
-        st.plotly_chart(fig_delta, use_container_width=True)
-    with col2:
-        st.plotly_chart(fig_gamma, use_container_width=True)
-    with col3:
-        st.plotly_chart(fig_theta, use_container_width=True)
-    with col4:
-        st.plotly_chart(fig_vega, use_container_width=True)
-    with col5:
-        st.plotly_chart(fig_rho, use_container_width=True)
-
-    # Mostrar el valor de la opción y las letras griegas en una sola fila
-    st.subheader("💵 Valor de la Opción Call y Letras Griegas")
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
-    with col1:
-        st.metric("Precio de la Opción Call", f"{call_price:.4f}")
-    with col2:
-        st.metric("Δ Delta", f"{delta:.4f}")
-    with col3:
-        st.metric("Γ Gamma", f"{gamma:.4f}")
-    with col4:
-        st.metric("Θ Theta", f"{theta:.4f}")
-    with col5:
-        st.metric("ν Vega", f"{vega:.4f}")
-    with col6:
-        st.metric("ρ Rho", f"{rho:.4f}")
 
 # Página de Aproximación de Taylor
-with tab2:
-    st.title("📈 Aproximación de Taylor")
+with tab1:
+    st.title("📊 Aproximación de Taylor")
 
     # Descripción de la expansión de Taylor
     with st.expander("📚 ¿Qué es la Expansión de Taylor?"):
@@ -294,7 +165,7 @@ with tab2:
         st.error(f"Error al procesar la función: {e}")
 
 # Página de Árbol Binomial
-with tab3:
+with tab2:
     st.title("🌳 Valuación de Opciones con Árbol Binomial")
 
     # Descripción del modelo de árbol binomial
@@ -397,6 +268,137 @@ with tab3:
 
     # Mostrar el precio final de la opción
     st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
+
+# Página de Black-Scholes
+with tab3:
+    st.title("📈 Visualizador de Letras Griegas en Black-Scholes")
+
+    # Descripción de las letras griegas
+    with st.expander("📚 ¿Qué son las Letras Griegas?"):
+        st.markdown("""
+        **Letras Griegas:**
+        - **Delta (Δ):** Sensibilidad del precio de la opción respecto al precio del activo subyacente.
+        - **Gamma (Γ):** Sensibilidad de Delta respecto al precio del activo.
+        - **Theta (Θ):** Sensibilidad del precio de la opción respecto al tiempo.
+        - **Vega (ν):** Sensibilidad del precio de la opción respecto a la volatilidad.
+        - **Rho (ρ):** Sensibilidad del precio de la opción respecto a la tasa de interés.
+        """)
+
+    # Controles en la parte superior
+    st.header("⚙️ Parámetros de la Opción")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        S = st.slider("Precio del Activo (S)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.")
+    with col2:
+        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.")
+    with col3:
+        T = st.slider("Tiempo hasta vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.")
+
+    col4, col5 = st.columns(2)
+    with col4:
+        r = st.slider("Tasa libre de riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.")
+    with col5:
+        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.")
+
+    # Fórmula de Black-Scholes para una opción call
+    def black_scholes_call(S, K, T, r, sigma):
+        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        d2 = d1 - sigma * np.sqrt(T)
+        call_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
+        return call_price
+
+    # Calcular el precio de la opción call
+    call_price = black_scholes_call(S, K, T, r, sigma)
+
+    # Cálculo de las letras griegas
+    def delta_call(S, K, T, r, sigma):
+        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        return norm.cdf(d1)
+
+    def gamma_call(S, K, T, r, sigma):
+        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        return norm.pdf(d1) / (S * sigma * np.sqrt(T))
+
+    def theta_call(S, K, T, r, sigma):
+        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        d2 = d1 - sigma * np.sqrt(T)
+        return - (S * norm.pdf(d1) * sigma) / (2 * np.sqrt(T)) - r * K * np.exp(-r * T) * norm.cdf(d2)
+
+    def vega_call(S, K, T, r, sigma):
+        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        return S * norm.pdf(d1) * np.sqrt(T)
+
+    def rho_call(S, K, T, r, sigma):
+        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        d2 = d1 - sigma * np.sqrt(T)
+        return K * T * np.exp(-r * T) * norm.cdf(d2)
+
+    # Calcular las letras griegas
+    delta = delta_call(S, K, T, r, sigma)
+    gamma = gamma_call(S, K, T, r, sigma)
+    theta = theta_call(S, K, T, r, sigma)
+    vega = vega_call(S, K, T, r, sigma)
+    rho = rho_call(S, K, T, r, sigma)
+
+    # Gráficos de las letras griegas con Plotly
+    st.subheader("📊 Gráficas de las Letras Griegas")
+    S_range = np.linspace(1, 200, 100)
+    delta_values = delta_call(S_range, K, T, r, sigma)
+    gamma_values = gamma_call(S_range, K, T, r, sigma)
+    theta_values = theta_call(S_range, K, T, r, sigma)
+    vega_values = vega_call(S_range, K, T, r, sigma)
+    rho_values = rho_call(S_range, K, T, r, sigma)
+
+    # Crear gráficos interactivos
+    fig_delta = go.Figure()
+    fig_delta.add_trace(go.Scatter(x=S_range, y=delta_values, mode='lines', name='Delta', line=dict(color='blue')))
+    fig_delta.update_layout(title="Δ Delta", xaxis_title="Precio del Activo (S)", yaxis_title="Delta", template="plotly_dark" if theme == "dark" else "plotly_white")
+
+    fig_gamma = go.Figure()
+    fig_gamma.add_trace(go.Scatter(x=S_range, y=gamma_values, mode='lines', name='Gamma', line=dict(color='orange')))
+    fig_gamma.update_layout(title="Γ Gamma", xaxis_title="Precio del Activo (S)", yaxis_title="Gamma", template="plotly_dark" if theme == "dark" else "plotly_white")
+
+    fig_theta = go.Figure()
+    fig_theta.add_trace(go.Scatter(x=S_range, y=theta_values, mode='lines', name='Theta', line=dict(color='green')))
+    fig_theta.update_layout(title="Θ Theta", xaxis_title="Precio del Activo (S)", yaxis_title="Theta", template="plotly_dark" if theme == "dark" else "plotly_white")
+
+    fig_vega = go.Figure()
+    fig_vega.add_trace(go.Scatter(x=S_range, y=vega_values, mode='lines', name='Vega', line=dict(color='red')))
+    fig_vega.update_layout(title="ν Vega", xaxis_title="Precio del Activo (S)", yaxis_title="Vega", template="plotly_dark" if theme == "dark" else "plotly_white")
+
+    fig_rho = go.Figure()
+    fig_rho.add_trace(go.Scatter(x=S_range, y=rho_values, mode='lines', name='Rho', line=dict(color='purple')))
+    fig_rho.update_layout(title="ρ Rho", xaxis_title="Precio del Activo (S)", yaxis_title="Rho", template="plotly_dark" if theme == "dark" else "plotly_white")
+
+    # Mostrar gráficos en columnas
+    col1, col2, col3, col4, col5 = st.columns(5)
+    with col1:
+        st.plotly_chart(fig_delta, use_container_width=True)
+    with col2:
+        st.plotly_chart(fig_gamma, use_container_width=True)
+    with col3:
+        st.plotly_chart(fig_theta, use_container_width=True)
+    with col4:
+        st.plotly_chart(fig_vega, use_container_width=True)
+    with col5:
+        st.plotly_chart(fig_rho, use_container_width=True)
+
+    # Mostrar el valor de la opción y las letras griegas en una sola fila
+    st.subheader("💵 Valor de la Opción Call y Letras Griegas")
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    with col1:
+        st.metric("Precio de la Opción Call", f"{call_price:.4f}")
+    with col2:
+        st.metric("Δ Delta", f"{delta:.4f}")
+    with col3:
+        st.metric("Γ Gamma", f"{gamma:.4f}")
+    with col4:
+        st.metric("Θ Theta", f"{theta:.4f}")
+    with col5:
+        st.metric("ν Vega", f"{vega:.4f}")
+    with col6:
+        st.metric("ρ Rho", f"{rho:.4f}")
+
 # Página de Expansión de Taylor para Call
 with tab4:
     st.title("📉 Expansión de Taylor para una Opción Call")
@@ -463,6 +465,25 @@ with tab4:
 
     # Calcular el precio real de la opción call para el rango de precios
     call_prices = [black_scholes_call(S, K, T, r, sigma) for S in S_range]
+
+    # Mostrar las ecuaciones de la expansión de Taylor
+    st.subheader("📝 Ecuaciones de la Expansión de Taylor")
+    st.markdown(r"""
+    **Aproximación de Primer Grado (Lineal):**
+    \[
+    C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0)
+    \]
+    Donde:
+    - \( C(S_0) = \) Precio de la opción call en \( S_0 \).
+    - \( \Delta(S_0) = \) Delta de la opción en \( S_0 \).
+
+    **Aproximación de Segundo Grado (Cuadrática):**
+    \[
+    C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0) + \frac{1}{2} \Gamma(S_0) \cdot (S - S_0)^2
+    \]
+    Donde:
+    - \( \Gamma(S_0) = \) Gamma de la opción en \( S_0 \).
+    """)
 
     # Graficar la expansión de Taylor y el precio real de la opción
     st.subheader("📊 Gráfica de la Expansión de Taylor")
