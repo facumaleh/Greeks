@@ -11,71 +11,6 @@ st.set_page_config(
     page_title="Visualizador de Black-Scholes, Taylor y Binomial",
     page_icon="📊"
 )
-
-# Función para cambiar entre modo claro y oscuro
-def toggle_theme():
-    if st.session_state.get("theme", "light") == "light":
-        st.session_state.theme = "dark"
-    else:
-        st.session_state.theme = "light"
-
-# Aplicar el tema seleccionado
-def apply_theme():
-    theme = st.session_state.get("theme", "light")
-    if theme == "dark":
-        st.markdown("""
-        <style>
-        .stApp {
-            background-color: #1E1E1E;
-            color: #FFFFFF;
-        }
-        .stSlider>div>div>div>div {
-            background-color: #4CAF50;
-        }
-        .stTextInput>div>div>input {
-            color: #FFFFFF;
-        }
-        .stSelectbox>div>div>div {
-            color: #FFFFFF;
-        }
-        .stMarkdown {
-            color: #FFFFFF;
-        }
-        .css-1d391kg {
-            background-color: #1E1E1E;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-        <style>
-        .stApp {
-            background-color: #FFFFFF;
-            color: #000000;
-        }
-        .stSlider>div>div>div>div {
-            background-color: #4CAF50;
-        }
-        .stTextInput>div>div>input {
-            color: #000000;
-        }
-        .stSelectbox>div>div>div {
-            color: #000000;
-        }
-        .stMarkdown {
-            color: #000000;
-        }
-        .css-1d391kg {
-            background-color: #FFFFFF;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-# Selección de tema en el cuerpo principal
-st.title("Visualizador de Black-Scholes, Taylor y Binomial")
-theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
-apply_theme()
-
 # Menú de navegación con pestañas
 tab1, tab2, tab3 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor", "🌳 Árbol Binomial"])
 
@@ -344,6 +279,86 @@ with tab2:
         st.error(f"Error al procesar la función: {e}")
 
 # Página de Árbol Binomial
+import streamlit as st
+import numpy as np
+import matplotlib.pyplot as plt
+import networkx as nx
+
+# Configuración de la página
+st.set_page_config(
+    layout="wide",
+    page_title="Visualizador de Black-Scholes, Taylor y Binomial",
+    page_icon="📊"
+)
+
+# Función para cambiar entre modo claro y oscuro
+def toggle_theme():
+    if st.session_state.get("theme", "light") == "light":
+        st.session_state.theme = "dark"
+    else:
+        st.session_state.theme = "light"
+
+# Aplicar el tema seleccionado
+def apply_theme():
+    theme = st.session_state.get("theme", "light")
+    if theme == "dark":
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #FFFFFF;
+        }
+        .stSelectbox>div>div>div {
+            color: #FFFFFF;
+        }
+        .stMarkdown {
+            color: #FFFFFF;
+        }
+        .css-1d391kg {
+            background-color: #1E1E1E;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #000000;
+        }
+        .stSelectbox>div>div>div {
+            color: #000000;
+        }
+        .stMarkdown {
+            color: #000000;
+        }
+        .css-1d391kg {
+            background-color: #FFFFFF;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# Selección de tema en el cuerpo principal
+st.title("Visualizador de Black-Scholes, Taylor y Binomial")
+theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
+apply_theme()
+
+# Menú de navegación con pestañas
+tab1, tab2, tab3 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor", "🌳 Árbol Binomial"])
+
+# Página de Árbol Binomial
 with tab3:
     st.title("🌳 Valuación de Opciones con Árbol Binomial")
 
@@ -375,9 +390,9 @@ with tab3:
         asset_prices = np.zeros((periods + 1, periods + 1))
         asset_prices[0, 0] = S
         for i in range(1, periods + 1):
-            asset_prices[i, 0] = asset_prices[i - 1, 0] * U
+            asset_prices[i, 0] = asset_prices[i - 1, 0] * U  # Nodo superior (sube)
             for j in range(1, i + 1):
-                asset_prices[i, j] = asset_prices[i - 1, j - 1] * D
+                asset_prices[i, j] = asset_prices[i - 1, j - 1] * D  # Nodo inferior (baja)
 
         # Inicializar el árbol de precios de la opción
         option_prices = np.zeros((periods + 1, periods + 1))
