@@ -5,8 +5,9 @@ import networkx as nx
 from scipy.stats import norm
 import sympy as sp
 import plotly.graph_objects as go
+import time
 
-# Configuración de la página 
+# Configuración de la página
 st.set_page_config(
     layout="wide",
     page_title="Enjoy Finance",
@@ -14,29 +15,30 @@ st.set_page_config(
 )
 
 # Aplicar el tema claro por defecto
-st.markdown("""
-    <style>
-    .stApp {
-        background-color: #FFFFFF;
-        color: #000000;
-    }
-    .stSlider>div>div>div>div {
-        background-color: #4CAF50;
-    }
-    .stTextInput>div>div>input {
-        color: #000000;
-    }
-    .stSelectbox>div>div>div {
-        color: #000000;
-    }
-    .stMarkdown {
-        color: #000000;
-    }
-    .css-1d391kg {
-        background-color: #FFFFFF;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+CSS_STYLES = """
+<style>
+.stApp {
+    background-color: #FFFFFF;
+    color: #000000;
+}
+.stSlider>div>div>div>div {
+    background-color: #4CAF50;
+}
+.stTextInput>div>div>input {
+    color: #000000;
+}
+.stSelectbox>div>div>div {
+    color: #000000;
+}
+.stMarkdown {
+    color: #000000;
+}
+.css-1d391kg {
+    background-color: #FFFFFF;
+}
+</style>
+"""
+st.markdown(CSS_STYLES, unsafe_allow_html=True)
 
 # Título de la aplicación
 st.title("Enjoy Finance")
@@ -52,7 +54,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 ])
 
 # Página de Aproximación de Taylor
-with tab1:
+def taylor_approximation():
     st.title("📊 Aproximación de Taylor")
 
     # Descripción de la expansión de Taylor
@@ -131,7 +133,7 @@ with tab1:
         st.error(f"Error al procesar la función: {e}")
 
 # Página de Árbol Binomial
-with tab2:
+def binomial_tree():
     st.title("🌳 Valuación de Opciones con Árbol Binomial")
 
     # Descripción del modelo de árbol binomial
@@ -155,6 +157,7 @@ with tab2:
         periods = st.number_input("Número de Periodos", value=3, min_value=1, key="binomial_periods")
 
     # Función para calcular el precio de la opción call usando árbol binomial
+    @st.cache
     def binomial_tree_call(S, K, U, D, R, periods):
         # Probabilidad neutral al riesgo
         q = (R - D) / (U - D)
@@ -188,7 +191,8 @@ with tab2:
         return asset_prices, option_prices, deltas, debts
 
     # Calcular el árbol binomial
-    asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
+    with st.spinner("Calculando..."):
+        asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
 
     # Función para graficar un árbol binomial
     def plot_binomial_tree(values, title, ax):
@@ -236,7 +240,7 @@ with tab2:
     st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
 
 # Página de Black-Scholes
-with tab3:
+def black_scholes():
     st.title("📈 Visualizador de Letras Griegas en Black-Scholes")
 
     # Descripción de las letras griegas
@@ -366,7 +370,7 @@ with tab3:
         st.metric("ρ Rho", f"{rho:.4f}")
 
 # Página de Expansión de Taylor para Call
-with tab4:
+def taylor_expansion_call():
     st.title("📉 Expansión de Taylor para una Opción Call")
 
     # Descripción de la expansión de Taylor aplicada a una opción call
@@ -550,71 +554,71 @@ with tab4:
     - **Áreas en verde claro:** Indican donde el polinomio de Taylor **sobrestima** el precio real de la opción.
     """)
 
+# Página de Optimización con Lagrange
+def lagrange_optimization():
+    st.title("🔍 Optimización con Método de Lagrange")
+    
+    # Descripción del método de Lagrange
+    with st.expander("📚 ¿Qué es el Método de Lagrange?"):
+        st.markdown("""
+        **Método de Lagrange:**
+        - El método de Lagrange se utiliza para encontrar los extremos de una función sujeta a restricciones.
+        - Se introduce un multiplicador de Lagrange (\(\lambda\)) para incorporar la restricción en la función objetivo.
+        - El sistema de ecuaciones se resuelve para encontrar los valores óptimos de \(x\), \(y\) y \(\lambda\).
+        """)
+    
+    # Entrada de la función objetivo y la restricción
+    st.header("⚙️ Ingresa la Función Objetivo y la Restricción")
+    col1, col2 = st.columns(2)
+    with col1:
+        funcion_objetivo = st.text_input("Función Objetivo (f(x, y)):", "x**2 + y**2", key="lagrange_funcion_objetivo")
+    with col2:
+        restriccion = st.text_input("Restricción (g(x, y) = 0):", "x + y - 1", key="lagrange_restriccion")
+    
+    # Definir las variables simbólicas
+    x, y, lambda_ = sp.symbols('x y lambda')
+    
+    try:
+        # Convertir las entradas del usuario en funciones simbólicas
+        f = sp.sympify(funcion_objetivo)
+        g = sp.sympify(restriccion)
+    
+        # Construir la función de Lagrange
+        L = f - lambda_ * g
+    
+        # Calcular las derivadas parciales
+        dL_dx = sp.diff(L, x)
+        dL_dy = sp.diff(L, y)
+        dL_dlambda = sp.diff(L, lambda_)
+    
+        # Mostrar las derivadas parciales
+        st.subheader("📝 Derivadas Parciales")
+        st.latex(f"\\frac{{\\partial L}}{{\\partial x}} = {sp.latex(dL_dx)}")
+        st.latex(f"\\frac{{\\partial L}}{{\\partial y}} = {sp.latex(dL_dy)}")
+        st.latex(f"\\frac{{\\partial L}}{{\\partial \\lambda}} = {sp.latex(dL_dlambda)}")
+    
+        # Resolver el sistema de ecuaciones
+        st.subheader("🔍 Solución del Sistema de Ecuaciones")
+        soluciones = sp.solve([dL_dx, dL_dy, dL_dlambda], (x, y, lambda_), dict=True)
+    
+        if soluciones:
+            for i, sol in enumerate(soluciones):
+                st.markdown(f"**Solución {i + 1}:**")
+                st.latex(f"x = {sp.latex(sol[x])}")
+                st.latex(f"y = {sp.latex(sol[y])}")
+                st.latex(f"\\lambda = {sp.latex(sol[lambda_])}")
+    
+                # Evaluar la función objetivo en la solución
+                valor_optimo = f.subs({x: sol[x], y: sol[y]})
+                st.markdown(f"**Valor Óptimo de la Función Objetivo:** `{valor_optimo:.4f}`")
+        else:
+            st.error("No se encontraron soluciones para el sistema de ecuaciones.")
+    
+    except Exception as e:
+        st.error(f"Error al procesar la función o la restricción: {e}")
 
-    # Página de Optimización con Lagrange
-    with tab5:
-        st.title("🔍 Optimización con Método de Lagrange")
-    
-        # Descripción del método de Lagrange
-        with st.expander("📚 ¿Qué es el Método de Lagrange?"):
-            st.markdown("""
-            **Método de Lagrange:**
-            - El método de Lagrange se utiliza para encontrar los extremos de una función sujeta a restricciones.
-            - Se introduce un multiplicador de Lagrange (\(\lambda\)) para incorporar la restricción en la función objetivo.
-            - El sistema de ecuaciones se resuelve para encontrar los valores óptimos de \(x\), \(y\) y \(\lambda\).
-            """)
-    
-        # Entrada de la función objetivo y la restricción
-        st.header("⚙️ Ingresa la Función Objetivo y la Restricción")
-        col1, col2 = st.columns(2)
-        with col1:
-            funcion_objetivo = st.text_input("Función Objetivo (f(x, y)):", "x**2 + y**2", key="lagrange_funcion_objetivo")
-        with col2:
-            restriccion = st.text_input("Restricción (g(x, y) = 0):", "x + y - 1", key="lagrange_restriccion")
-    
-        # Definir las variables simbólicas
-        x, y, lambda_ = sp.symbols('x y lambda')
-    
-        try:
-            # Convertir las entradas del usuario en funciones simbólicas
-            f = sp.sympify(funcion_objetivo)
-            g = sp.sympify(restriccion)
-    
-            # Construir la función de Lagrange
-            L = f - lambda_ * g
-    
-            # Calcular las derivadas parciales
-            dL_dx = sp.diff(L, x)
-            dL_dy = sp.diff(L, y)
-            dL_dlambda = sp.diff(L, lambda_)
-    
-            # Mostrar las derivadas parciales
-            st.subheader("📝 Derivadas Parciales")
-            st.latex(f"\\frac{{\\partial L}}{{\\partial x}} = {sp.latex(dL_dx)}")
-            st.latex(f"\\frac{{\\partial L}}{{\\partial y}} = {sp.latex(dL_dy)}")
-            st.latex(f"\\frac{{\\partial L}}{{\\partial \\lambda}} = {sp.latex(dL_dlambda)}")
-    
-            # Resolver el sistema de ecuaciones
-            st.subheader("🔍 Solución del Sistema de Ecuaciones")
-            soluciones = sp.solve([dL_dx, dL_dy, dL_dlambda], (x, y, lambda_), dict=True)
-    
-            if soluciones:
-                for i, sol in enumerate(soluciones):
-                    st.markdown(f"**Solución {i + 1}:**")
-                    st.latex(f"x = {sp.latex(sol[x])}")
-                    st.latex(f"y = {sp.latex(sol[y])}")
-                    st.latex(f"\\lambda = {sp.latex(sol[lambda_])}")
-    
-                    # Evaluar la función objetivo en la solución
-                    valor_optimo = f.subs({x: sol[x], y: sol[y]})
-                    st.markdown(f"**Valor Óptimo de la Función Objetivo:** `{valor_optimo:.4f}`")
-            else:
-                st.error("No se encontraron soluciones para el sistema de ecuaciones.")
-    
-        except Exception as e:
-            st.error(f"Error al procesar la función o la restricción: {e}")
-    # Página de Paridad Put-Call
-with tab6:
+# Página de Paridad Put-Call
+def put_call_parity():
     st.title("📉 Valor de un Put usando Paridad Put-Call")
 
     # Descripción de la Paridad Put-Call
@@ -675,6 +679,25 @@ with tab6:
     - **Tiempo hasta Vencimiento (T):** Tiempo restante hasta el vencimiento de la opción.
     - **Precio de la Opción Put (P):** Precio calculado de la opción put usando la fórmula de paridad put-call.
     """)
+
+# Llamadas a las funciones de cada pestaña
+with tab1:
+    taylor_approximation()
+
+with tab2:
+    binomial_tree()
+
+with tab3:
+    black_scholes()
+
+with tab4:
+    taylor_expansion_call()
+
+with tab5:
+    lagrange_optimization()
+
+with tab6:
+    put_call_parity()
 
 # Pie de página
 st.markdown("---")
