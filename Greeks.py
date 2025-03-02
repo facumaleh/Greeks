@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1hcfH8Pp1HAtWaJm9NaEYlrH1FOzWalyd
 """
 
-!pip install streamlit numpy matplotlib scipy pyngrok
+pip install streamlit numpy matplotlib scipy
 
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
