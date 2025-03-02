@@ -6,12 +6,76 @@ from scipy.stats import norm
 import sympy as sp
 import plotly.graph_objects as go
 
-# Configuración de la página 
+# Configuración de la página (DEBE SER LA PRIMERA LÍNEA DE STREAMLIT)
 st.set_page_config(
     layout="wide",
     page_title="Visualizador de Black-Scholes, Taylor y Binomial",
     page_icon="📊"
 )
+
+# Función para cambiar entre modo claro y oscuro
+def toggle_theme():
+    if st.session_state.get("theme", "light") == "light":
+        st.session_state.theme = "dark"
+    else:
+        st.session_state.theme = "light"
+
+# Aplicar el tema seleccionado
+def apply_theme():
+    theme = st.session_state.get("theme", "light")
+    if theme == "dark":
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #FFFFFF;
+        }
+        .stSelectbox>div>div>div {
+            color: #FFFFFF;
+        }
+        .stMarkdown {
+            color: #FFFFFF;
+        }
+        .css-1d391kg {
+            background-color: #1E1E1E;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #000000;
+        }
+        .stSelectbox>div>div>div {
+            color: #000000;
+        }
+        .stMarkdown {
+            color: #000000;
+        }
+        .css-1d391kg {
+            background-color: #FFFFFF;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# Selección de tema en el cuerpo principal
+st.title("Visualizador de Black-Scholes, Taylor y Binomial")
+theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
+apply_theme()
 
 # Menú de navegación con pestañas
 tab1, tab2, tab3 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor", "🌳 Árbol Binomial"])
