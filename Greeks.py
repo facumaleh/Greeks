@@ -8,12 +8,6 @@ st.set_page_config(layout="wide")
 
 # Título y descripción
 st.title("📊 Visualizador de Letras Griegas en Black-Scholes")
-st.markdown("""
-**Esta aplicación** te permite visualizar cómo cambian las letras griegas (Delta, Gamma, Theta, Vega, Rho) 
-en la fórmula de Black-Scholes para una opción call. 
-
-👉 Usa los controles debajo para ajustar los parámetros.
-""")
 
 # Controles en una sola fila
 st.header("⚙️ Parámetros de la Opción")
