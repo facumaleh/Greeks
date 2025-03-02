@@ -403,11 +403,11 @@ with tab3:
     asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
 
     # Función para graficar un árbol binomial
-    def plot_binomial_tree(values, title):
+    def plot_binomial_tree(values, title, ax):
         G = nx.Graph()
         pos = {}
         labels = {}
-        for i in range(periods + 1):
+        for i in range(values.shape[0]):
             for j in range(i + 1):
                 node = (i, j)
                 G.add_node(node)
@@ -417,20 +417,27 @@ with tab3:
                     parent = (i - 1, j) if j < i else (i - 1, j - 1)
                     G.add_edge(parent, node)
 
-        plt.figure(figsize=(10, 6))
-        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="lightblue", font_size=10, font_weight="bold")
-        plt.title(title)
-        st.pyplot(plt)
+        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="lightblue", font_size=10, font_weight="bold", ax=ax)
+        ax.set_title(title)
 
-    # Mostrar los árboles binomiales
-    st.subheader("📊 Árbol de Precios de la Opción Call")
-    plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call")
+    # Mostrar los árboles binomiales uno al lado del otro
+    st.subheader("📊 Árboles Binomiales")
+    col1, col2, col3 = st.columns(3)
 
-    st.subheader("📊 Árbol de Deltas (Δ)")
-    plot_binomial_tree(deltas, "Árbol de Deltas (Δ)")
+    with col1:
+        fig1, ax1 = plt.subplots(figsize=(6, 4))
+        plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call", ax1)
+        st.pyplot(fig1)
 
-    st.subheader("📊 Árbol de Deudas (B)")
-    plot_binomial_tree(debts, "Árbol de Deudas (B)")
+    with col2:
+        fig2, ax2 = plt.subplots(figsize=(6, 4))
+        plot_binomial_tree(deltas, "Árbol de Deltas (Δ)", ax2)
+        st.pyplot(fig2)
+
+    with col3:
+        fig3, ax3 = plt.subplots(figsize=(6, 4))
+        plot_binomial_tree(debts, "Árbol de Deudas (B)", ax3)
+        st.pyplot(fig3)
 
     # Mostrar el precio final de la opción
     st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
