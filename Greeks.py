@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+import sympy as sp
 
 # Configurar la aplicación en pantalla completa
 st.set_page_config(layout="wide")
