@@ -145,15 +145,44 @@ with tab2:
     st.header("⚙️ Ingresa una función")
     function_input = st.text_input("Ingresa una función de x (por ejemplo, sin(x), exp(x), x**2):", "sin(x)")
 
-    # Punto de expansión
-    x0 = st.slider("Punto de expansión (x0)", -10.0, 10.0, 0.0)
+    # Configuración del gráfico
+    st.header("⚙️ Configuración del gráfico")
 
-    # Rango de visualización
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
-        x_min = st.slider("Límite inferior de x", -10.0, 10.0, -5.0)
+        x0 = st.slider(
+            "Punto de expansión (x0)",
+            min_value=-10.0,
+            max_value=10.0,
+            value=0.0,  # Valor predeterminado
+            step=0.1,   # Paso más pequeño para mayor precisión
+            help="Selecciona el punto alrededor del cual se calculará la expansión de Taylor."
+        )
     with col2:
-        x_max = st.slider("Límite superior de x", -10.0, 10.0, 5.0)
+        x_min = st.slider(
+            "Límite inferior de x",
+            min_value=-10.0,
+            max_value=10.0,
+            value=-5.0,  # Valor predeterminado
+            step=0.1,    # Paso más pequeño para mayor precisión
+            help="Define el valor mínimo de x para el gráfico."
+        )
+    with col3:
+        x_max = st.slider(
+            "Límite superior de x",
+            min_value=-10.0,
+            max_value=10.0,
+            value=5.0,   # Valor predeterminado
+            step=0.1,    # Paso más pequeño para mayor precisión
+            help="Define el valor máximo de x para el gráfico."
+        )
+
+    # Mostrar los valores seleccionados
+    st.markdown(f"""
+    - **Punto de expansión (x0):** `{x0}`
+    - **Límite inferior de x:** `{x_min}`
+    - **Límite superior de x:** `{x_max}`
+    """)
 
     # Definir la variable simbólica
     x = sp.symbols('x')
