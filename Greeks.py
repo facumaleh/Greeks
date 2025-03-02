@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-import sympy as sp
+import sympy as sp  # Asegúrate de que sympy esté instalado
 
 # Configuración de la página
 st.set_page_config(
@@ -11,6 +11,69 @@ st.set_page_config(
     page_icon="📊"
 )
 
+# Función para cambiar entre modo claro y oscuro
+def toggle_theme():
+    if st.session_state.get("theme", "light") == "light":
+        st.session_state.theme = "dark"
+    else:
+        st.session_state.theme = "light"
+
+# Aplicar el tema seleccionado
+def apply_theme():
+    theme = st.session_state.get("theme", "light")
+    if theme == "dark":
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #FFFFFF;
+        }
+        .stSelectbox>div>div>div {
+            color: #FFFFFF;
+        }
+        .stMarkdown {
+            color: #FFFFFF;
+        }
+        .css-1d391kg {
+            background-color: #1E1E1E;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #000000;
+        }
+        .stSelectbox>div>div>div {
+            color: #000000;
+        }
+        .stMarkdown {
+            color: #000000;
+        }
+        .css-1d391kg {
+            background-color: #FFFFFF;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# Selección de tema en el cuerpo principal
+st.title("Visualizador de Black-Scholes y Taylor")
+theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
+apply_theme()
 
 # Menú de navegación con pestañas
 tab1, tab2 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor"])
@@ -103,50 +166,52 @@ with tab1:
         vega_values = vega_call(S_range, K, T, r, sigma)
         rho_values = rho_call(S_range, K, T, r, sigma)
 
-        # Gráfico de Delta
-        fig1, ax1 = plt.subplots(figsize=(10, 4))
-        ax1.plot(S_range, delta_values, label='Delta', color='blue')
-        ax1.set_title('Δ Delta')
-        ax1.set_xlabel('Precio del Activo (S)')
-        ax1.set_ylabel('Delta')
-        ax1.grid(True)
-        st.pyplot(fig1)
+        # Organizar los gráficos en 3 por fila
+        cols = st.columns(3)
+        with cols[0]:
+            fig1, ax1 = plt.subplots(figsize=(6, 4))
+            ax1.plot(S_range, delta_values, label='Delta', color='blue')
+            ax1.set_title('Δ Delta')
+            ax1.set_xlabel('Precio del Activo (S)')
+            ax1.set_ylabel('Delta')
+            ax1.grid(True)
+            st.pyplot(fig1)
 
-        # Gráfico de Gamma
-        fig2, ax2 = plt.subplots(figsize=(10, 4))
-        ax2.plot(S_range, gamma_values, label='Gamma', color='orange')
-        ax2.set_title('Γ Gamma')
-        ax2.set_xlabel('Precio del Activo (S)')
-        ax2.set_ylabel('Gamma')
-        ax2.grid(True)
-        st.pyplot(fig2)
+        with cols[1]:
+            fig2, ax2 = plt.subplots(figsize=(6, 4))
+            ax2.plot(S_range, gamma_values, label='Gamma', color='orange')
+            ax2.set_title('Γ Gamma')
+            ax2.set_xlabel('Precio del Activo (S)')
+            ax2.set_ylabel('Gamma')
+            ax2.grid(True)
+            st.pyplot(fig2)
 
-        # Gráfico de Theta
-        fig3, ax3 = plt.subplots(figsize=(10, 4))
-        ax3.plot(S_range, theta_values, label='Theta', color='green')
-        ax3.set_title('Θ Theta')
-        ax3.set_xlabel('Precio del Activo (S)')
-        ax3.set_ylabel('Theta')
-        ax3.grid(True)
-        st.pyplot(fig3)
+        with cols[2]:
+            fig3, ax3 = plt.subplots(figsize=(6, 4))
+            ax3.plot(S_range, theta_values, label='Theta', color='green')
+            ax3.set_title('Θ Theta')
+            ax3.set_xlabel('Precio del Activo (S)')
+            ax3.set_ylabel('Theta')
+            ax3.grid(True)
+            st.pyplot(fig3)
 
-        # Gráfico de Vega
-        fig4, ax4 = plt.subplots(figsize=(10, 4))
-        ax4.plot(S_range, vega_values, label='Vega', color='red')
-        ax4.set_title('ν Vega')
-        ax4.set_xlabel('Precio del Activo (S)')
-        ax4.set_ylabel('Vega')
-        ax4.grid(True)
-        st.pyplot(fig4)
+        with cols[0]:
+            fig4, ax4 = plt.subplots(figsize=(6, 4))
+            ax4.plot(S_range, vega_values, label='Vega', color='red')
+            ax4.set_title('ν Vega')
+            ax4.set_xlabel('Precio del Activo (S)')
+            ax4.set_ylabel('Vega')
+            ax4.grid(True)
+            st.pyplot(fig4)
 
-        # Gráfico de Rho
-        fig5, ax5 = plt.subplots(figsize=(10, 4))
-        ax5.plot(S_range, rho_values, label='Rho', color='purple')
-        ax5.set_title('ρ Rho')
-        ax5.set_xlabel('Precio del Activo (S)')
-        ax5.set_ylabel('Rho')
-        ax5.grid(True)
-        st.pyplot(fig5)
+        with cols[1]:
+            fig5, ax5 = plt.subplots(figsize=(6, 4))
+            ax5.plot(S_range, rho_values, label='Rho', color='purple')
+            ax5.set_title('ρ Rho')
+            ax5.set_xlabel('Precio del Activo (S)')
+            ax5.set_ylabel('Rho')
+            ax5.grid(True)
+            st.pyplot(fig5)
 
 # Página de Aproximación de Taylor
 with tab2:
