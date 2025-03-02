@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 from scipy.stats import norm  # Importar norm desde scipy.stats
+import sympy as sp
+
 
 # Configuración de la página (DEBE SER LA PRIMERA LÍNEA DE STREAMLIT)
 st.set_page_config(
