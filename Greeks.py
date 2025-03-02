@@ -5,7 +5,76 @@ from scipy.stats import norm
 import sympy as sp
 
 # Configuración de la página
-st.set_page_config(layout="wide", page_title="Visualizador de Black-Scholes y Taylor")
+st.set_page_config(
+    layout="wide",
+    page_title="Visualizador de Black-Scholes y Taylor",
+    page_icon="📊"
+)
+
+# Función para cambiar entre modo claro y oscuro
+def toggle_theme():
+    if st.session_state.get("theme", "light") == "light":
+        st.session_state.theme = "dark"
+    else:
+        st.session_state.theme = "light"
+
+# Aplicar el tema seleccionado
+def apply_theme():
+    theme = st.session_state.get("theme", "light")
+    if theme == "dark":
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #FFFFFF;
+        }
+        .stSelectbox>div>div>div {
+            color: #FFFFFF;
+        }
+        .stMarkdown {
+            color: #FFFFFF;
+        }
+        .css-1d391kg {
+            background-color: #1E1E1E;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #000000;
+        }
+        .stSelectbox>div>div>div {
+            color: #000000;
+        }
+        .stMarkdown {
+            color: #000000;
+        }
+        .css-1d391kg {
+            background-color: #FFFFFF;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# Barra lateral para navegación y selección de tema
+st.sidebar.title("Configuración")
+st.sidebar.markdown("---")
+theme = st.sidebar.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
+apply_theme()
 
 # Menú de navegación
 menu = st.sidebar.selectbox("Selecciona una página", ["Black-Scholes", "Aproximación de Taylor"])
