@@ -205,17 +205,31 @@ with cols[4]:
     ax5.grid(True)
     st.pyplot(fig5)
 
-    # Mostrar el valor de la opción y las letras griegas debajo de los gráficos
-    st.subheader("💵 Valor de la Opción Call")
+  # Mostrar el valor de la opción y las letras griegas en una sola fila
+st.subheader("💵 Valor de la Opción Call y Letras Griegas")
+
+# Crear 6 columnas: 1 para el precio de la opción y 5 para las letras griegas
+col1, col2, col3, col4, col5, col6 = st.columns(6)
+
+# Precio de la opción Call
+with col1:
     st.metric("Precio de la Opción Call", f"{call_price:.4f}")
 
-    st.subheader("📈 Valores de las Letras Griegas")
-    col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric("Δ Delta", f"{delta:.4f}")
-    col2.metric("Γ Gamma", f"{gamma:.4f}")
-    col3.metric("Θ Theta", f"{theta:.4f}")
-    col4.metric("ν Vega", f"{vega:.4f}")
-    col5.metric("ρ Rho", f"{rho:.4f}")
+# Valores de las letras griegas
+with col2:
+    st.metric("Δ Delta", f"{delta:.4f}")
+
+with col3:
+    st.metric("Γ Gamma", f"{gamma:.4f}")
+
+with col4:
+    st.metric("Θ Theta", f"{theta:.4f}")
+
+with col5:
+    st.metric("ν Vega", f"{vega:.4f}")
+
+with col6:
+    st.metric("ρ Rho", f"{rho:.4f}")
 
 # Página de Aproximación de Taylor
 with tab2:
