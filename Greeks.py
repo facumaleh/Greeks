@@ -152,9 +152,9 @@ with tab2:
     with col1:
         x0 = st.slider(
             "Punto de expansión (x0)",
-            min_value=-10.0,
-            max_value=10.0,
-            value=0.0,  # Valor predeterminado
+            min_value=-15.0,
+            max_value=15.0,
+            value=0.01,  # Valor predeterminado
             step=0.1,   # Paso más pequeño para mayor precisión
             help="Selecciona el punto alrededor del cual se calculará la expansión de Taylor."
         )
