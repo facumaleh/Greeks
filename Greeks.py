@@ -6,7 +6,7 @@ from scipy.stats import norm
 import sympy as sp
 import plotly.graph_objects as go
 
-# Configuración de la página (DEBE SER LA PRIMERA LÍNEA DE STREAMLIT)
+# Configuración de la página 
 st.set_page_config(
     layout="wide",
     page_title="Enjoy Finance",
@@ -39,7 +39,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # Título de la aplicación
-st.title("Visualizador de Opciones Financieras")
+st.title("Enjoy Finance")
 
 # Menú de navegación con pestañas
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
