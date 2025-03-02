@@ -149,60 +149,61 @@ with tab1:
     rho = rho_call(S, K, T, r, sigma)
 
     # Gráficos de las letras griegas
-    st.subheader("📊 Gráficas de las Letras Griegas")
-    S_range = np.linspace(1, 200, 100)
-    delta_values = delta_call(S_range, K, T, r, sigma)
-    gamma_values = gamma_call(S_range, K, T, r, sigma)
-    theta_values = theta_call(S_range, K, T, r, sigma)
-    vega_values = vega_call(S_range, K, T, r, sigma)
-    rho_values = rho_call(S_range, K, T, r, sigma)
+st.subheader("📊 Gráficas de las Letras Griegas")
+S_range = np.linspace(1, 200, 100)
+delta_values = delta_call(S_range, K, T, r, sigma)
+gamma_values = gamma_call(S_range, K, T, r, sigma)
+theta_values = theta_call(S_range, K, T, r, sigma)
+vega_values = vega_call(S_range, K, T, r, sigma)
+rho_values = rho_call(S_range, K, T, r, sigma)
 
-    # Organizar los gráficos en 3 por fila
-    cols = st.columns(3)
-    with cols[0]:
-        fig1, ax1 = plt.subplots(figsize=(6, 4))
-        ax1.plot(S_range, delta_values, label='Delta', color='blue')
-        ax1.set_title('Δ Delta')
-        ax1.set_xlabel('Precio del Activo (S)')
-        ax1.set_ylabel('Delta')
-        ax1.grid(True)
-        st.pyplot(fig1)
+# Organizar los gráficos en 5 columnas (una para cada gráfico)
+cols = st.columns(5)  # Cambia a 5 columnas
 
-    with cols[1]:
-        fig2, ax2 = plt.subplots(figsize=(6, 4))
-        ax2.plot(S_range, gamma_values, label='Gamma', color='orange')
-        ax2.set_title('Γ Gamma')
-        ax2.set_xlabel('Precio del Activo (S)')
-        ax2.set_ylabel('Gamma')
-        ax2.grid(True)
-        st.pyplot(fig2)
+with cols[0]:
+    fig1, ax1 = plt.subplots(figsize=(6, 4))
+    ax1.plot(S_range, delta_values, label='Delta', color='blue')
+    ax1.set_title('Δ Delta')
+    ax1.set_xlabel('Precio del Activo (S)')
+    ax1.set_ylabel('Delta')
+    ax1.grid(True)
+    st.pyplot(fig1)
 
-    with cols[2]:
-        fig3, ax3 = plt.subplots(figsize=(6, 4))
-        ax3.plot(S_range, theta_values, label='Theta', color='green')
-        ax3.set_title('Θ Theta')
-        ax3.set_xlabel('Precio del Activo (S)')
-        ax3.set_ylabel('Theta')
-        ax3.grid(True)
-        st.pyplot(fig3)
+with cols[1]:
+    fig2, ax2 = plt.subplots(figsize=(6, 4))
+    ax2.plot(S_range, gamma_values, label='Gamma', color='orange')
+    ax2.set_title('Γ Gamma')
+    ax2.set_xlabel('Precio del Activo (S)')
+    ax2.set_ylabel('Gamma')
+    ax2.grid(True)
+    st.pyplot(fig2)
 
-    with cols[0]:
-        fig4, ax4 = plt.subplots(figsize=(6, 4))
-        ax4.plot(S_range, vega_values, label='Vega', color='red')
-        ax4.set_title('ν Vega')
-        ax4.set_xlabel('Precio del Activo (S)')
-        ax4.set_ylabel('Vega')
-        ax4.grid(True)
-        st.pyplot(fig4)
+with cols[2]:
+    fig3, ax3 = plt.subplots(figsize=(6, 4))
+    ax3.plot(S_range, theta_values, label='Theta', color='green')
+    ax3.set_title('Θ Theta')
+    ax3.set_xlabel('Precio del Activo (S)')
+    ax3.set_ylabel('Theta')
+    ax3.grid(True)
+    st.pyplot(fig3)
 
-    with cols[1]:
-        fig5, ax5 = plt.subplots(figsize=(6, 4))
-        ax5.plot(S_range, rho_values, label='Rho', color='purple')
-        ax5.set_title('ρ Rho')
-        ax5.set_xlabel('Precio del Activo (S)')
-        ax5.set_ylabel('Rho')
-        ax5.grid(True)
-        st.pyplot(fig5)
+with cols[3]:
+    fig4, ax4 = plt.subplots(figsize=(6, 4))
+    ax4.plot(S_range, vega_values, label='Vega', color='red')
+    ax4.set_title('ν Vega')
+    ax4.set_xlabel('Precio del Activo (S)')
+    ax4.set_ylabel('Vega')
+    ax4.grid(True)
+    st.pyplot(fig4)
+
+with cols[4]:
+    fig5, ax5 = plt.subplots(figsize=(6, 4))
+    ax5.plot(S_range, rho_values, label='Rho', color='purple')
+    ax5.set_title('ρ Rho')
+    ax5.set_xlabel('Precio del Activo (S)')
+    ax5.set_ylabel('Rho')
+    ax5.grid(True)
+    st.pyplot(fig5)
 
     # Mostrar el valor de la opción y las letras griegas debajo de los gráficos
     st.subheader("💵 Valor de la Opción Call")
