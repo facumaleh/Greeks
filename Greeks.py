@@ -72,7 +72,7 @@ if menu == "Black-Scholes":
     delta = delta_call(S, K, T, r, sigma)
     gamma = gamma_call(S, K, T, r, sigma)
     theta = theta_call(S, K, T, r, sigma)
-    ve ga = vega_call(S, K, T, r, sigma)
+    vega = vega_call(S, K, T, r, sigma)  # Corregido: sin espacio en "vega"
     rho = rho_call(S, K, T, r, sigma)
 
     # Mostrar los valores de las letras griegas en columnas
