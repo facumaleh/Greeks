@@ -234,7 +234,7 @@ with tab2:
     # Configuración del gráfico
     st.header("⚙️ Configuración del gráfico")
 
-    col1, col2, col3 = st.columns(5)
+    col1, col2, col3 = st.columns(3)
     with col1:
         x0 = st.slider(
             "Punto de expansión (x0)",
