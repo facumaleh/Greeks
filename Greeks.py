@@ -9,10 +9,6 @@ st.set_page_config(layout="wide")
 # Título y descripción
 st.title("📊 Visualizador de Letras Griegas en Black-Scholes")
 
-# Selector de tema
-theme = st.sidebar.selectbox("Selecciona un tema", ["Claro", "Oscuro"])
-if theme == "Oscuro":
-    plt.style.use('dark_background')
 
 # Controles en dos filas
 st.header("⚙️ Parámetros de la Opción")
