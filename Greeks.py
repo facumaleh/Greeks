@@ -310,19 +310,42 @@ with tab2:
             st.error(f"Error al evaluar la función: {e}")
             st.stop()
 
-        # Graficar la función original y las aproximaciones de Taylor
+        # Graficar la función original y las aproximaciones de Taylor en una sola fila
         st.subheader("📊 Gráficas")
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.plot(x_vals, y_vals, label=f"Función: {function_input}", color='blue')
-        ax.plot(x_vals, y_taylor_1, label="Taylor Grado 1", color='green', linestyle='--')
-        ax.plot(x_vals, y_taylor_2, label="Taylor Grado 2", color='red', linestyle='--')
-        ax.axvline(x=x0, color='gray', linestyle=':', label=f"Punto de expansión (x0 = {x0})")
-        ax.set_title("Aproximación de Taylor")
-        ax.set_xlabel("x")
-        ax.set_ylabel("f(x)")
-        ax.legend()
-        ax.grid(True)
-        st.pyplot(fig)
+        cols = st.columns(3)  # Crear 3 columnas para los gráficos
+
+        with cols[0]:
+            fig1, ax1 = plt.subplots(figsize=(6, 4))
+            ax1.plot(x_vals, y_vals, label=f"Función: {function_input}", color='blue')
+            ax1.axvline(x=x0, color='gray', linestyle=':', label=f"Punto de expansión (x0 = {x0})")
+            ax1.set_title("Función Original")
+            ax1.set_xlabel("x")
+            ax1.set_ylabel("f(x)")
+            ax1.legend()
+            ax1.grid(True)
+            st.pyplot(fig1)
+
+        with cols[1]:
+            fig2, ax2 = plt.subplots(figsize=(6, 4))
+            ax2.plot(x_vals, y_taylor_1, label="Taylor Grado 1", color='green', linestyle='--')
+            ax2.axvline(x=x0, color='gray', linestyle=':', label=f"Punto de expansión (x0 = {x0})")
+            ax2.set_title("Taylor Grado 1")
+            ax2.set_xlabel("x")
+            ax2.set_ylabel("f(x)")
+            ax2.legend()
+            ax2.grid(True)
+            st.pyplot(fig2)
+
+        with cols[2]:
+            fig3, ax3 = plt.subplots(figsize=(6, 4))
+            ax3.plot(x_vals, y_taylor_2, label="Taylor Grado 2", color='red', linestyle='--')
+            ax3.axvline(x=x0, color='gray', linestyle=':', label=f"Punto de expansión (x0 = {x0})")
+            ax3.set_title("Taylor Grado 2")
+            ax3.set_xlabel("x")
+            ax3.set_ylabel("f(x)")
+            ax3.legend()
+            ax3.grid(True)
+            st.pyplot(fig3)
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
