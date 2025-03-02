@@ -9,22 +9,31 @@ st.set_page_config(layout="wide")
 # Título y descripción
 st.title("📊 Visualizador de Letras Griegas en Black-Scholes")
 
-# Controles en una sola fila
+# Selector de tema
+theme = st.sidebar.selectbox("Selecciona un tema", ["Claro", "Oscuro"])
+if theme == "Oscuro":
+    plt.style.use('dark_background')
+
+# Controles en dos filas
 st.header("⚙️ Parámetros de la Opción")
 
-# Crear 5 columnas para los controles
-col1, col2, col3, col4, col5 = st.columns(5)
-
+col1, col2, col3 = st.columns(3)
 with col1:
     S = st.slider("Precio del Activo (S)", 1.0, 200.0, 100.0)
 with col2:
     K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0)
 with col3:
     T = st.slider("Tiempo hasta vencimiento (T)", 0.1, 5.0, 1.0)
+
+col4, col5 = st.columns(2)
 with col4:
     r = st.slider("Tasa libre de riesgo (r)", 0.0, 0.2, 0.05)
 with col5:
     sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2)
+
+# Botón para reiniciar valores
+if st.button("Reiniciar valores"):
+    S, K, T, r, sigma = 100.0, 100.0, 1.0, 0.05, 0.2
 
 # Fórmula de Black-Scholes para una opción call
 def black_scholes_call(S, K, T, r, sigma):
@@ -88,7 +97,7 @@ theta_values = theta_call(S_range, K, T, r, sigma)
 vega_values = vega_call(S_range, K, T, r, sigma)
 rho_values = rho_call(S_range, K, T, r, sigma)
 
-fig, ax = plt.subplots(3, 2, figsize=(14, 10))
+fig, ax = plt.subplots(3, 2, figsize=(16, 12))
 
 # Personalizar las gráficas
 ax[0, 0].plot(S_range, delta_values, label='Delta', color='blue')
