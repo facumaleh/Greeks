@@ -131,7 +131,7 @@ st.pyplot(fig)
 # Pie de página
 st.markdown("---")
 st.markdown("""
-**Creado por:** [Tu Nombre](https://github.com/tu-usuario)  
-**Repositorio:** [GitHub](https://github.com/tu-usuario/tu-repositorio)  
+**Creado por:** Facundo Maleh  
+
 **Nota:** Esta aplicación es solo para fines educativos.
 """)
