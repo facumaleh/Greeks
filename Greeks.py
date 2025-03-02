@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 # Configuración de la página (DEBE SER LA PRIMERA LÍNEA DE STREAMLIT)
 st.set_page_config(
     layout="wide",
-    page_title="Visualizador de Opciones Financieras",
+    page_title="Enjoy Finance",
     page_icon="📊"
 )
 
@@ -43,12 +43,12 @@ st.title("Visualizador de Opciones Financieras")
 
 # Menú de navegación con pestañas
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    "📊 Aproximación de Taylor", 
-    "🌳 Árbol Binomial", 
-    "📈 Black-Scholes", 
-    "📉 Expansión de Taylor para Call",
-    "🔍 Optimización con Lagrange",
-    "📉 Paridad Put-Call"
+    "1️⃣ Aproximación de Taylor", 
+    "2️⃣ Árbol Binomial", 
+    "3️⃣ Black-Scholes", 
+    "4️⃣ Expansión de Taylor para Call",
+    "5️⃣ Optimización con Lagrange",
+    "6️⃣ Paridad Put-Call"
 ])
 
 # Página de Aproximación de Taylor
@@ -60,7 +60,7 @@ with tab1:
         st.markdown("""
         **Expansión de Taylor:**
         - La expansión de Taylor permite aproximar una función alrededor de un punto \( x_0 \).
-        - Aquí puedes calcular las expansiones de Taylor de grado 1 y grado 2 para cualquier función.
+        - Aca podes calcular las expansiones de Taylor de grado 1 y grado 2 para cualquier función.
         """)
 
     # Entrada de la función
@@ -205,7 +205,7 @@ with tab2:
                     parent = (i - 1, j) if j < i else (i - 1, j - 1)
                     G.add_edge(parent, node)
 
-        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="lightblue", font_size=10, font_weight="bold", ax=ax)
+        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="red", font_size=10, font_weight="bold", ax=ax)
         ax.set_title(title)
 
     # Mostrar los árboles binomiales uno al lado del otro
@@ -375,7 +375,7 @@ with tab4:
         **Expansión de Taylor para una Opción Call:**
         - La expansión de Taylor permite aproximar el precio de una opción call alrededor de un precio del activo subyacente \( S_0 \).
         - Se utiliza para estimar cómo cambia el precio de la opción cuando el precio del activo subyacente varía ligeramente.
-        - Aquí se calcula la expansión de Taylor de primer y segundo orden.
+        - Aca se calcula la expansión de Taylor de primer y segundo orden.
         """)
 
     # Controles para los parámetros de la opción
