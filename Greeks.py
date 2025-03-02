@@ -401,23 +401,35 @@ with tab3:
     # Calcular el árbol binomial
     asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
 
-    # Mostrar los resultados
-    st.subheader("📊 Resultados del Árbol Binomial")
+    # Función para graficar un árbol binomial
+    def plot_binomial_tree(values, title):
+        G = nx.Graph()
+        pos = {}
+        labels = {}
+        for i in range(periods + 1):
+            for j in range(i + 1):
+                node = (i, j)
+                G.add_node(node)
+                pos[node] = (i, j - i / 2)
+                labels[node] = f"{values[i, j]:.2f}"
+                if i > 0:
+                    parent = (i - 1, j) if j < i else (i - 1, j - 1)
+                    G.add_edge(parent, node)
 
-    # Mostrar el árbol de precios del activo
-    st.markdown("**Árbol de Precios del Activo:**")
-    st.write(asset_prices)
+        plt.figure(figsize=(10, 6))
+        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="lightblue", font_size=10, font_weight="bold")
+        plt.title(title)
+        st.pyplot(plt)
 
-    # Mostrar el árbol de precios de la opción
-    st.markdown("**Árbol de Precios de la Opción Call:**")
-    st.write(option_prices)
+    # Mostrar los árboles binomiales
+    st.subheader("📊 Árbol de Precios de la Opción Call")
+    plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call")
 
-    # Mostrar las proporciones de delta y deuda
-    st.markdown("**Proporciones de Delta y Deuda en Cada Nodo:**")
-    st.markdown("**Delta (Δ):**")
-    st.write(deltas)
-    st.markdown("**Deuda (B):**")
-    st.write(debts)
+    st.subheader("📊 Árbol de Deltas (Δ)")
+    plot_binomial_tree(deltas, "Árbol de Deltas (Δ)")
+
+    st.subheader("📊 Árbol de Deudas (B)")
+    plot_binomial_tree(debts, "Árbol de Deudas (B)")
 
     # Mostrar el precio final de la opción
     st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
