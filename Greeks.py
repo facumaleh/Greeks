@@ -157,38 +157,38 @@ def binomial_tree():
         periods = st.number_input("Número de Periodos", value=3, min_value=1, key="binomial_periods")
 
     # Función para calcular el precio de la opción call usando árbol binomial
-    @st.cache
-    def binomial_tree_call(S, K, U, D, R, periods):
-        # Probabilidad neutral al riesgo
-        q = (R - D) / (U - D)
+   @st.cache_data
+def binomial_tree_call(S, K, U, D, R, periods):
+    # Probabilidad neutral al riesgo
+    q = (R - D) / (U - D)
 
-        # Inicializar el árbol de precios del activo
-        asset_prices = np.zeros((periods + 1, periods + 1))
-        asset_prices[0, 0] = S
-        for i in range(1, periods + 1):
-            asset_prices[i, 0] = asset_prices[i - 1, 0] * U  # Nodo superior (sube)
-            for j in range(1, i + 1):
-                asset_prices[i, j] = asset_prices[i - 1, j - 1] * D  # Nodo inferior (baja)
+    # Inicializar el árbol de precios del activo
+    asset_prices = np.zeros((periods + 1, periods + 1))
+    asset_prices[0, 0] = S
+    for i in range(1, periods + 1):
+        asset_prices[i, 0] = asset_prices[i - 1, 0] * U  # Nodo superior (sube)
+        for j in range(1, i + 1):
+            asset_prices[i, j] = asset_prices[i - 1, j - 1] * D  # Nodo inferior (baja)
 
-        # Inicializar el árbol de precios de la opción
-        option_prices = np.zeros((periods + 1, periods + 1))
-        for j in range(periods + 1):
-            option_prices[periods, j] = max(0, asset_prices[periods, j] - K)
+    # Inicializar el árbol de precios de la opción
+    option_prices = np.zeros((periods + 1, periods + 1))
+    for j in range(periods + 1):
+        option_prices[periods, j] = max(0, asset_prices[periods, j] - K)
 
-        # Valuación hacia atrás
-        for i in range(periods - 1, -1, -1):
-            for j in range(i + 1):
-                option_prices[i, j] = (q * option_prices[i + 1, j] + (1 - q) * option_prices[i + 1, j + 1]) / R
+    # Valuación hacia atrás
+    for i in range(periods - 1, -1, -1):
+        for j in range(i + 1):
+            option_prices[i, j] = (q * option_prices[i + 1, j] + (1 - q) * option_prices[i + 1, j + 1]) / R
 
-        # Calcular delta y deuda en cada nodo
-        deltas = np.zeros((periods, periods + 1))
-        debts = np.zeros((periods, periods + 1))
-        for i in range(periods):
-            for j in range(i + 1):
-                deltas[i, j] = (option_prices[i + 1, j] - option_prices[i + 1, j + 1]) / (asset_prices[i + 1, j] - asset_prices[i + 1, j + 1])
-                debts[i, j] = (option_prices[i + 1, j + 1] * U - option_prices[i + 1, j] * D) / (R * (U - D))
+    # Calcular delta y deuda en cada nodo
+    deltas = np.zeros((periods, periods + 1))
+    debts = np.zeros((periods, periods + 1))
+    for i in range(periods):
+        for j in range(i + 1):
+            deltas[i, j] = (option_prices[i + 1, j] - option_prices[i + 1, j + 1]) / (asset_prices[i + 1, j] - asset_prices[i + 1, j + 1])
+            debts[i, j] = (option_prices[i + 1, j + 1] * U - option_prices[i + 1, j] * D) / (R * (U - D))
 
-        return asset_prices, option_prices, deltas, debts
+    return asset_prices, option_prices, deltas, debts
 
     # Calcular el árbol binomial
     with st.spinner("Calculando..."):
