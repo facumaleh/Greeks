@@ -467,23 +467,28 @@ with tab4:
     call_prices = [black_scholes_call(S, K, T, r, sigma) for S in S_range]
 
     # Mostrar las ecuaciones de la expansión de Taylor
-    st.subheader("📝 Ecuaciones de la Expansión de Taylor")
-    st.markdown(r"""
-    **Aproximación de Primer Grado (Lineal):**
-    \[
-    C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0)
-    \]
-    Donde:
-    - \( C(S_0) = \) Precio de la opción call en \( S_0 \).
-    - \( \Delta(S_0) = \) Delta de la opción en \( S_0 \).
+st.subheader("📝 Ecuaciones de la Expansión de Taylor")
 
-    **Aproximación de Segundo Grado (Cuadrática):**
-    \[
-    C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0) + \frac{1}{2} \Gamma(S_0) \cdot (S - S_0)^2
-    \]
-    Donde:
-    - \( \Gamma(S_0) = \) Gamma de la opción en \( S_0 \).
-    """)
+# Aproximación de Primer Grado (Lineal)
+st.markdown("**Aproximación de Primer Grado (Lineal):**")
+st.latex(r"""
+C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0)
+""")
+st.markdown("Donde:")
+st.markdown(r"""
+- \( C(S_0) = \) Precio de la opción call en \( S_0 \).
+- \( \Delta(S_0) = \) Delta de la opción en \( S_0 \).
+""")
+
+# Aproximación de Segundo Grado (Cuadrática)
+st.markdown("**Aproximación de Segundo Grado (Cuadrática):**")
+st.latex(r"""
+C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0) + \frac{1}{2} \Gamma(S_0) \cdot (S - S_0)^2
+""")
+st.markdown("Donde:")
+st.markdown(r"""
+- \( \Gamma(S_0) = \) Gamma de la opción en \( S_0 \).
+""")
 
     # Graficar la expansión de Taylor y el precio real de la opción
     st.subheader("📊 Gráfica de la Expansión de Taylor")
