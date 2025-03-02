@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 # Configuración de la página
 st.set_page_config(
     layout="wide",
-    page_title="Visualizador de Opciones Financieras",
+    page_title="Enjoy finance",
     page_icon="📊"
 )
 
