@@ -70,14 +70,13 @@ def apply_theme():
         </style>
         """, unsafe_allow_html=True)
 
-# Barra lateral para navegación y selección de tema
-st.sidebar.title("Configuración")
-st.sidebar.markdown("---")
-theme = st.sidebar.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
+# Selección de tema en el cuerpo principal
+st.title("Visualizador de Black-Scholes y Taylor")
+theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
 apply_theme()
 
-# Menú de navegación
-menu = st.sidebar.selectbox("Selecciona una página", ["Black-Scholes", "Aproximación de Taylor"])
+# Menú de navegación en el cuerpo principal
+menu = st.radio("Selecciona una página", ["Black-Scholes", "Aproximación de Taylor"], horizontal=True)
 
 # Página de Black-Scholes
 if menu == "Black-Scholes":
