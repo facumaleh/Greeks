@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+import sympy as sp
 
 # Configuración de la página
 st.set_page_config(
@@ -74,11 +75,11 @@ st.title("Visualizador de Black-Scholes y Taylor")
 theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
 apply_theme()
 
-# Menú de navegación en el cuerpo principal
-menu = st.radio("Selecciona una página", ["Black-Scholes", "Aproximación de Taylor"], horizontal=True)
+# Menú de navegación con pestañas
+tab1, tab2 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor"])
 
 # Página de Black-Scholes
-if menu == "Black-Scholes":
+with tab1:
     st.title("📊 Visualizador de Letras Griegas en Black-Scholes")
 
     # Descripción de las letras griegas
@@ -211,7 +212,7 @@ if menu == "Black-Scholes":
         st.pyplot(fig5)
 
 # Página de Aproximación de Taylor
-elif menu == "Aproximación de Taylor":
+with tab2:
     st.title("📈 Aproximación de Taylor")
 
     # Descripción de la expansión de Taylor
