@@ -73,7 +73,7 @@ def apply_theme():
         """, unsafe_allow_html=True)
 
 # Selección de tema en el cuerpo principal
-st.title("Visualizador de Opciones Financieras")
+st.title("Enjoy Finance")
 theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
 apply_theme()
 
