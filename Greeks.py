@@ -53,7 +53,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 ])
 
 # Función para calcular la expansión de Taylor
-@st.cache
+@st.cache_data  # Updated to use st.cache_data
 def calcular_taylor(function_input, x0, x_min, x_max):
     """
     Calcula la expansión de Taylor de primer y segundo orden para una función dada.
