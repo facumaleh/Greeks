@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+from scipy.stats import norm
 
 # Configuración de la página (DEBE SER LA PRIMERA LÍNEA DE STREAMLIT)
 st.set_page_config(
