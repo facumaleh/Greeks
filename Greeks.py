@@ -1,10 +1,3 @@
-# Instalar sympy si no está instalado
-try:
-    import sympy as sp
-except ImportError:
-    !pip install sympy
-    import sympy as sp
-
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
