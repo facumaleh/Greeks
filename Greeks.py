@@ -344,7 +344,6 @@ with tab2:
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
 
-# Página de Árbol Binomial
 with tab3:
     st.title("🌳 Valuación de Opciones con Árbol Binomial")
 
@@ -423,22 +422,27 @@ with tab3:
 
     # Mostrar los árboles binomiales uno al lado del otro
     st.subheader("📊 Árboles Binomiales")
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         fig1, ax1 = plt.subplots(figsize=(6, 4))
-        plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call", ax1)
+        plot_binomial_tree(asset_prices, "Árbol de Precios del Activo", ax1)
         st.pyplot(fig1)
 
     with col2:
         fig2, ax2 = plt.subplots(figsize=(6, 4))
-        plot_binomial_tree(deltas, "Árbol de Deltas (Δ)", ax2)
+        plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call", ax2)
         st.pyplot(fig2)
 
     with col3:
         fig3, ax3 = plt.subplots(figsize=(6, 4))
-        plot_binomial_tree(debts, "Árbol de Deudas (B)", ax3)
+        plot_binomial_tree(deltas, "Árbol de Deltas (Δ)", ax3)
         st.pyplot(fig3)
+
+    with col4:
+        fig4, ax4 = plt.subplots(figsize=(6, 4))
+        plot_binomial_tree(debts, "Árbol de Deudas (B)", ax4)
+        st.pyplot(fig4)
 
     # Mostrar el precio final de la opción
     st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
