@@ -128,6 +128,23 @@ def taylor_approximation():
         fig.update_layout(title="Aproximación de Taylor", xaxis_title="x", yaxis_title="f(x)", template="plotly_white")
         st.plotly_chart(fig, use_container_width=True)
 
+        # Mostrar los polinomios genéricos y evaluar en un punto específico
+        st.subheader("🔢 Evaluación de los Polinomios de Taylor")
+        st.markdown("**Polinomios Genéricos:**")
+        st.latex(f"T_1(x) = {sp.latex(taylor_1)}")
+        st.latex(f"T_2(x) = {sp.latex(taylor_2)}")
+
+        # Entrada para evaluar los polinomios en un punto específico
+        eval_point = st.number_input("Ingresa un valor de x para evaluar los polinomios de Taylor:", value=x0, key="eval_point_unique")
+
+        # Evaluar los polinomios en el punto especificado
+        taylor_1_eval = taylor_1.subs(x, eval_point)
+        taylor_2_eval = taylor_2.subs(x, eval_point)
+
+        st.markdown("**Valores de los Polinomios en el punto especificado:**")
+        st.latex(f"T_1({eval_point}) = {taylor_1_eval}")
+        st.latex(f"T_2({eval_point}) = {taylor_2_eval}")
+
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
 
