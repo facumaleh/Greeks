@@ -4,5 +4,4 @@ matplotlib
 scipy
 sympy
 networkx
-go
 plotly
