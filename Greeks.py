@@ -6,6 +6,7 @@ from scipy.stats import norm
 import sympy as sp
 import plotly.graph_objects as go
 
+# Configuración de la página (DEBE SER LA PRIMERA LÍNEA DE STREAMLIT)
 st.set_page_config(
     layout="wide",
     page_title="Visualizador de Opciones Financieras",
@@ -37,10 +38,8 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Selección de tema en el cuerpo principal
-st.title("Enjoy Finance")
-theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
-apply_theme()
+# Título de la aplicación
+st.title("Visualizador de Opciones Financieras")
 
 # Menú de navegación con pestañas
 tab1, tab2, tab3, tab4 = st.tabs([
@@ -123,7 +122,7 @@ with tab1:
         fig.add_trace(go.Scatter(x=x_vals, y=y_taylor_1, mode='lines', name="Taylor Grado 1", line=dict(color='green', dash='dash')))
         fig.add_trace(go.Scatter(x=x_vals, y=y_taylor_2, mode='lines', name="Taylor Grado 2", line=dict(color='red', dash='dash')))
         fig.add_vline(x=x0, line=dict(color='gray', dash='dot'), annotation_text=f"x0 = {x0}", annotation_position="top right")
-        fig.update_layout(title="Aproximación de Taylor", xaxis_title="x", yaxis_title="f(x)", template="plotly_dark" if theme == "dark" else "plotly_white")
+        fig.update_layout(title="Aproximación de Taylor", xaxis_title="x", yaxis_title="f(x)", template="plotly_white")
         st.plotly_chart(fig, use_container_width=True)
 
     except Exception as e:
@@ -317,23 +316,23 @@ with tab3:
     # Crear gráficos interactivos
     fig_delta = go.Figure()
     fig_delta.add_trace(go.Scatter(x=S_range, y=delta_values, mode='lines', name='Delta', line=dict(color='blue')))
-    fig_delta.update_layout(title="Δ Delta", xaxis_title="Precio del Activo (S)", yaxis_title="Delta", template="plotly_dark" if theme == "dark" else "plotly_white")
+    fig_delta.update_layout(title="Δ Delta", xaxis_title="Precio del Activo (S)", yaxis_title="Delta", template="plotly_white")
 
     fig_gamma = go.Figure()
     fig_gamma.add_trace(go.Scatter(x=S_range, y=gamma_values, mode='lines', name='Gamma', line=dict(color='orange')))
-    fig_gamma.update_layout(title="Γ Gamma", xaxis_title="Precio del Activo (S)", yaxis_title="Gamma", template="plotly_dark" if theme == "dark" else "plotly_white")
+    fig_gamma.update_layout(title="Γ Gamma", xaxis_title="Precio del Activo (S)", yaxis_title="Gamma", template="plotly_white")
 
     fig_theta = go.Figure()
     fig_theta.add_trace(go.Scatter(x=S_range, y=theta_values, mode='lines', name='Theta', line=dict(color='green')))
-    fig_theta.update_layout(title="Θ Theta", xaxis_title="Precio del Activo (S)", yaxis_title="Theta", template="plotly_dark" if theme == "dark" else "plotly_white")
+    fig_theta.update_layout(title="Θ Theta", xaxis_title="Precio del Activo (S)", yaxis_title="Theta", template="plotly_white")
 
     fig_vega = go.Figure()
     fig_vega.add_trace(go.Scatter(x=S_range, y=vega_values, mode='lines', name='Vega', line=dict(color='red')))
-    fig_vega.update_layout(title="ν Vega", xaxis_title="Precio del Activo (S)", yaxis_title="Vega", template="plotly_dark" if theme == "dark" else "plotly_white")
+    fig_vega.update_layout(title="ν Vega", xaxis_title="Precio del Activo (S)", yaxis_title="Vega", template="plotly_white")
 
     fig_rho = go.Figure()
     fig_rho.add_trace(go.Scatter(x=S_range, y=rho_values, mode='lines', name='Rho', line=dict(color='purple')))
-    fig_rho.update_layout(title="ρ Rho", xaxis_title="Precio del Activo (S)", yaxis_title="Rho", template="plotly_dark" if theme == "dark" else "plotly_white")
+    fig_rho.update_layout(title="ρ Rho", xaxis_title="Precio del Activo (S)", yaxis_title="Rho", template="plotly_white")
 
     # Mostrar gráficos en columnas
     col1, col2, col3, col4, col5 = st.columns(5)
@@ -364,7 +363,6 @@ with tab3:
     with col6:
         st.metric("ρ Rho", f"{rho:.4f}")
 
-# Página de Expansión de Taylor para Call
 # Página de Expansión de Taylor para Call
 with tab4:
     st.title("📉 Expansión de Taylor para una Opción Call")
@@ -449,107 +447,107 @@ with tab4:
   
 
     # Graficar la expansión de Taylor y el precio real de la opción
-   # Graficar la expansión de Taylor y el precio real de la opción
-st.subheader("📊 Gráfica de la Expansión de Taylor")
+    st.subheader("📊 Gráfica de la Expansión de Taylor")
+    
+    # Crear la figura con Plotly
+    fig = go.Figure()
+    
+    # Precio real de la opción
+    fig.add_trace(go.Scatter(
+        x=S_range,
+        y=call_prices,
+        mode='lines',
+        name='Precio Real de la Opción',
+        line=dict(color='blue', width=2)
+    ))
+    
+    # Aproximación de Taylor de primer grado
+    fig.add_trace(go.Scatter(
+        x=S_range,
+        y=taylor_1_values,
+        mode='lines',
+        name='Taylor Primer Orden',
+        line=dict(color='green', dash='dash', width=2)
+    ))
+    
+    # Aproximación de Taylor de segundo grado
+    fig.add_trace(go.Scatter(
+        x=S_range,
+        y=taylor_2_values,
+        mode='lines',
+        name='Taylor Segundo Orden',
+        line=dict(color='red', dash='dash', width=2)
+    ))
+    
+    # Resaltar áreas donde el polinomio subestima o sobreestima
+    fig.add_trace(go.Scatter(
+        x=S_range,
+        y=np.minimum(call_prices, taylor_1_values),  # Área donde Taylor 1 subestima
+        fill='tonexty',
+        mode='none',
+        name='Taylor 1 Subestima',
+        fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
+        showlegend=False
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=S_range,
+        y=np.maximum(call_prices, taylor_1_values),  # Área donde Taylor 1 sobreestima
+        fill='tonexty',
+        mode='none',
+        name='Taylor 1 Sobrestima',
+        fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
+        showlegend=False
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=S_range,
+        y=np.minimum(call_prices, taylor_2_values),  # Área donde Taylor 2 subestima
+        fill='tonexty',
+        mode='none',
+        name='Taylor 2 Subestima',
+        fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
+        showlegend=False
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=S_range,
+        y=np.maximum(call_prices, taylor_2_values),  # Área donde Taylor 2 sobreestima
+        fill='tonexty',
+        mode='none',
+        name='Taylor 2 Sobrestima',
+        fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
+        showlegend=False
+    ))
+    
+    # Línea vertical en el punto de expansión (S₀)
+    fig.add_vline(
+        x=S0,
+        line=dict(color='gray', dash='dot'),
+        annotation_text=f"S₀ = {S0}",
+        annotation_position="top right"
+    )
+    
+    # Configuración del layout
+    fig.update_layout(
+        title="Expansión de Taylor para una Opción Call",
+        xaxis_title="Precio del Activo (S)",
+        yaxis_title="Precio de la Opción",
+        template="plotly_white",
+        legend=dict(x=0.02, y=0.98),  # Posición de la leyenda
+        margin=dict(l=20, r=20, t=40, b=20)
+    )
+    
+    # Mostrar la gráfica
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # Explicación de las áreas
+    st.markdown("""
+    ### 🎯 Áreas de Subestimación y Sobrestimación
+    - **Áreas en rojo claro:** Indican donde el polinomio de Taylor **subestima** el precio real de la opción.
+    - **Áreas en verde claro:** Indican donde el polinomio de Taylor **sobrestima** el precio real de la opción.
+    """)
 
-# Crear la figura con Plotly
-fig = go.Figure()
-
-# Precio real de la opción
-fig.add_trace(go.Scatter(
-    x=S_range,
-    y=call_prices,
-    mode='lines',
-    name='Precio Real de la Opción',
-    line=dict(color='blue', width=2)
-))  # <-- Aquí faltaba el cierre del paréntesis y la coma
-
-# Aproximación de Taylor de primer grado
-fig.add_trace(go.Scatter(
-    x=S_range,
-    y=taylor_1_values,
-    mode='lines',
-    name='Taylor Primer Orden',
-    line=dict(color='green', dash='dash', width=2)
-))  # <-- Aquí faltaba el cierre del paréntesis y la coma
-
-# Aproximación de Taylor de segundo grado
-fig.add_trace(go.Scatter(
-    x=S_range,
-    y=taylor_2_values,
-    mode='lines',
-    name='Taylor Segundo Orden',
-    line=dict(color='red', dash='dash', width=2)
-))  # <-- Aquí faltaba el cierre del paréntesis y la coma
-
-# Resaltar áreas donde el polinomio subestima o sobrestima
-fig.add_trace(go.Scatter(
-    x=S_range,
-    y=np.minimum(call_prices, taylor_1_values),  # Área donde Taylor 1 subestima
-    fill='tonexty',
-    mode='none',
-    name='Taylor 1 Subestima',
-    fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
-    showlegend=False
-))  # <-- Aquí faltaba el cierre del paréntesis y la coma
-
-fig.add_trace(go.Scatter(
-    x=S_range,
-    y=np.maximum(call_prices, taylor_1_values),  # Área donde Taylor 1 sobreestima
-    fill='tonexty',
-    mode='none',
-    name='Taylor 1 Sobrestima',
-    fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
-    showlegend=False
-))  # <-- Aquí faltaba el cierre del paréntesis y la coma
-
-fig.add_trace(go.Scatter(
-    x=S_range,
-    y=np.minimum(call_prices, taylor_2_values),  # Área donde Taylor 2 subestima
-    fill='tonexty',
-    mode='none',
-    name='Taylor 2 Subestima',
-    fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
-    showlegend=False
-))  # <-- Aquí faltaba el cierre del paréntesis y la coma
-
-fig.add_trace(go.Scatter(
-    x=S_range,
-    y=np.maximum(call_prices, taylor_2_values),  # Área donde Taylor 2 sobreestima
-    fill='tonexty',
-    mode='none',
-    name='Taylor 2 Sobrestima',
-    fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
-    showlegend=False
-))  # <-- Aquí faltaba el cierre del paréntesis y la coma
-
-# Línea vertical en el punto de expansión (S₀)
-fig.add_vline(
-    x=S0,
-    line=dict(color='gray', dash='dot'),
-    annotation_text=f"S₀ = {S0}",
-    annotation_position="top right"
-)
-
-# Configuración del layout
-fig.update_layout(
-    title="Expansión de Taylor para una Opción Call",
-    xaxis_title="Precio del Activo (S)",
-    yaxis_title="Precio de la Opción",
-    template="plotly_dark" if theme == "dark" else "plotly_white",
-    legend=dict(x=0.02, y=0.98),  # Posición de la leyenda
-    margin=dict(l=20, r=20, t=40, b=20)
-)
-
-# Mostrar la gráfica
-st.plotly_chart(fig, use_container_width=True)
-
-# Explicación de las áreas
-st.markdown("""
-### 🎯 Áreas de Subestimación y Sobrestimación
-- **Áreas en rojo claro:** Indican donde el polinomio de Taylor **subestima** el precio real de la opción.
-- **Áreas en verde claro:** Indican donde el polinomio de Taylor **sobrestima** el precio real de la opción.
-""")
 # Pie de página
 st.markdown("---")
 st.markdown("""
