@@ -78,8 +78,12 @@ theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") ==
 apply_theme()
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor", "🌳 Árbol Binomial"])
-
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📈 Black-Scholes", 
+    "📊 Aproximación de Taylor", 
+    "🌳 Árbol Binomial", 
+    "📉 Expansión de Taylor para Call"
+])
 # Página de Black-Scholes
 with tab1:
     st.title("📊 Visualizador de Letras Griegas en Black-Scholes")
@@ -393,6 +397,95 @@ with tab3:
 
     # Mostrar el precio final de la opción
     st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
+# Página de Expansión de Taylor para Call
+with tab4:
+    st.title("📉 Expansión de Taylor para una Opción Call")
+
+    # Descripción de la expansión de Taylor aplicada a una opción call
+    with st.expander("📚 ¿Qué es la Expansión de Taylor para una Opción Call?"):
+        st.markdown("""
+        **Expansión de Taylor para una Opción Call:**
+        - La expansión de Taylor permite aproximar el precio de una opción call alrededor de un precio del activo subyacente \( S_0 \).
+        - Se utiliza para estimar cómo cambia el precio de la opción cuando el precio del activo subyacente varía ligeramente.
+        - Aquí se calcula la expansión de Taylor de primer y segundo orden.
+        """)
+
+    # Controles para los parámetros de la opción
+    with st.expander("⚙️ Parámetros de la Opción"):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.")
+        with col2:
+            K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.")
+        with col3:
+            T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.")
+
+        col4, col5 = st.columns(2)
+        with col4:
+            r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.")
+        with col5:
+            sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.")
+
+    # Calcular el precio de la opción call usando Black-Scholes
+    def black_scholes_call(S, K, T, r, sigma):
+        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        d2 = d1 - sigma * np.sqrt(T)
+        call_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
+        return call_price
+
+    # Calcular las derivadas (Griegas) necesarias para la expansión de Taylor
+    def delta_call(S, K, T, r, sigma):
+        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        return norm.cdf(d1)
+
+    def gamma_call(S, K, T, r, sigma):
+        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        return norm.pdf(d1) / (S * sigma * np.sqrt(T))
+
+    # Precio de la opción call en S₀
+    call_price_S0 = black_scholes_call(S0, K, T, r, sigma)
+
+    # Expansión de Taylor de primer y segundo orden
+    def taylor_expansion_call(S, S0, call_price_S0, delta, gamma):
+        taylor_1 = call_price_S0 + delta * (S - S0)  # Primer orden
+        taylor_2 = taylor_1 + 0.5 * gamma * (S - S0)**2  # Segundo orden
+        return taylor_1, taylor_2
+
+    # Calcular Delta y Gamma en S₀
+    delta_S0 = delta_call(S0, K, T, r, sigma)
+    gamma_S0 = gamma_call(S0, K, T, r, sigma)
+
+    # Rango de precios del activo para graficar
+    S_range = np.linspace(S0 - 20, S0 + 20, 100)  # Rango alrededor de S₀
+
+    # Calcular la expansión de Taylor para el rango de precios
+    taylor_1_values, taylor_2_values = taylor_expansion_call(S_range, S0, call_price_S0, delta_S0, gamma_S0)
+
+    # Calcular el precio real de la opción call para el rango de precios
+    call_prices = [black_scholes_call(S, K, T, r, sigma) for S in S_range]
+
+    # Graficar la expansión de Taylor y el precio real de la opción
+    st.subheader("📊 Gráfica de la Expansión de Taylor")
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=S_range, y=call_prices, mode='lines', name='Precio Real de la Opción', line=dict(color='blue')))
+    fig.add_trace(go.Scatter(x=S_range, y=taylor_1_values, mode='lines', name='Taylor Primer Orden', line=dict(color='green', dash='dash')))
+    fig.add_trace(go.Scatter(x=S_range, y=taylor_2_values, mode='lines', name='Taylor Segundo Orden', line=dict(color='red', dash='dash')))
+    fig.add_vline(x=S0, line=dict(color='gray', dash='dot'), annotation_text=f"S₀ = {S0}", annotation_position="top right")
+    fig.update_layout(
+        title="Expansión de Taylor para una Opción Call",
+        xaxis_title="Precio del Activo (S)",
+        yaxis_title="Precio de la Opción",
+        template="plotly_dark" if theme == "dark" else "plotly_white"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Mostrar los valores de Delta y Gamma en S₀
+    st.subheader("📝 Valores de Delta y Gamma en S₀")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Δ Delta en S₀", f"{delta_S0:.4f}")
+    with col2:
+        st.metric("Γ Gamma en S₀", f"{gamma_S0:.4f}")
 
 # Pie de página
 st.markdown("---")
