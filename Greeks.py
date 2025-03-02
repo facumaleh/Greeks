@@ -7,7 +7,7 @@ import sympy as sp
 # Configuración de la página
 st.set_page_config(
     layout="wide",
-    page_title="Visualizador de Black-Scholes y Taylor",
+    page_title="Visualizador de Black-Scholes, Taylor y Binomial",
     page_icon="📊"
 )
 
@@ -71,12 +71,12 @@ def apply_theme():
         """, unsafe_allow_html=True)
 
 # Selección de tema en el cuerpo principal
-st.title("Visualizador de Black-Scholes y Taylor")
+st.title("Visualizador de Black-Scholes, Taylor y Binomial")
 theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
 apply_theme()
 
 # Menú de navegación con pestañas
-tab1, tab2 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor"])
+tab1, tab2, tab3 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor", "🌳 Árbol Binomial"])
 
 # Página de Black-Scholes
 with tab1:
@@ -341,6 +341,86 @@ with tab2:
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
+
+# Página de Árbol Binomial
+with tab3:
+    st.title("🌳 Valuación de Opciones con Árbol Binomial")
+
+    # Descripción del modelo de árbol binomial
+    st.markdown("""
+    **Modelo de Árbol Binomial:**
+    - Este modelo permite valuar una opción call utilizando un árbol binomial.
+    - Se calcula el precio de la opción hacia atrás (backwards) y se muestra la proporción de delta y deuda en cada nodo.
+    """)
+
+    # Entrada de parámetros
+    st.header("⚙️ Parámetros del Modelo")
+    col1, col2 = st.columns(2)
+    with col1:
+        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01)
+        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01)
+        U = st.number_input("Factor de Subida (U)", value=1.1, min_value=1.0)
+    with col2:
+        D = st.number_input("Factor de Bajada (D)", value=0.9, max_value=1.0)
+        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.05, min_value=1.0)
+        periods = st.number_input("Número de Periodos", value=3, min_value=1)
+
+    # Función para calcular el precio de la opción call usando árbol binomial
+    def binomial_tree_call(S, K, U, D, R, periods):
+        # Probabilidad neutral al riesgo
+        q = (R - D) / (U - D)
+
+        # Inicializar el árbol de precios del activo
+        asset_prices = np.zeros((periods + 1, periods + 1))
+        asset_prices[0, 0] = S
+        for i in range(1, periods + 1):
+            asset_prices[i, 0] = asset_prices[i - 1, 0] * U
+            for j in range(1, i + 1):
+                asset_prices[i, j] = asset_prices[i - 1, j - 1] * D
+
+        # Inicializar el árbol de precios de la opción
+        option_prices = np.zeros((periods + 1, periods + 1))
+        for j in range(periods + 1):
+            option_prices[periods, j] = max(0, asset_prices[periods, j] - K)
+
+        # Valuación hacia atrás
+        for i in range(periods - 1, -1, -1):
+            for j in range(i + 1):
+                option_prices[i, j] = (q * option_prices[i + 1, j] + (1 - q) * option_prices[i + 1, j + 1]) / R
+
+        # Calcular delta y deuda en cada nodo
+        deltas = np.zeros((periods, periods + 1))
+        debts = np.zeros((periods, periods + 1))
+        for i in range(periods):
+            for j in range(i + 1):
+                deltas[i, j] = (option_prices[i + 1, j] - option_prices[i + 1, j + 1]) / (asset_prices[i + 1, j] - asset_prices[i + 1, j + 1])
+                debts[i, j] = (option_prices[i + 1, j + 1] * U - option_prices[i + 1, j] * D) / (R * (U - D))
+
+        return asset_prices, option_prices, deltas, debts
+
+    # Calcular el árbol binomial
+    asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
+
+    # Mostrar los resultados
+    st.subheader("📊 Resultados del Árbol Binomial")
+
+    # Mostrar el árbol de precios del activo
+    st.markdown("**Árbol de Precios del Activo:**")
+    st.write(asset_prices)
+
+    # Mostrar el árbol de precios de la opción
+    st.markdown("**Árbol de Precios de la Opción Call:**")
+    st.write(option_prices)
+
+    # Mostrar las proporciones de delta y deuda
+    st.markdown("**Proporciones de Delta y Deuda en Cada Nodo:**")
+    st.markdown("**Delta (Δ):**")
+    st.write(deltas)
+    st.markdown("**Deuda (B):**")
+    st.write(debts)
+
+    # Mostrar el precio final de la opción
+    st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
 
 # Pie de página
 st.markdown("---")
