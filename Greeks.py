@@ -1,16 +1,22 @@
+# Instalar sympy si no está instalado
+try:
+    import sympy as sp
+except ImportError:
+    !pip install sympy
+    import sympy as sp
+
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-import sympy as sp
 
 # Configurar la aplicación en pantalla completa
 st.set_page_config(layout="wide")
 
-# Menú de navegación
-menu = st.sidebar.selectbox("Selecciona una página", ["Black-Scholes", "Aproximación de Taylor"])
+# Usar pestañas para la navegación
+tab1, tab2 = st.tabs(["Black-Scholes", "Aproximación de Taylor"])
 
-if menu == "Black-Scholes":
+with tab1:
     # Código de la página de Black-Scholes
     st.title("📊 Visualizador de Letras Griegas en Black-Scholes")
 
@@ -72,7 +78,7 @@ if menu == "Black-Scholes":
     delta = delta_call(S, K, T, r, sigma)
     gamma = gamma_call(S, K, T, r, sigma)
     theta = theta_call(S, K, T, r, sigma)
-    vega = vega_call(S, K, T, r, sigma)  # Corregido: sin espacio en "vega"
+    vega = vega_call(S, K, T, r, sigma)
     rho = rho_call(S, K, T, r, sigma)
 
     # Mostrar los valores de las letras griegas en columnas
@@ -127,9 +133,19 @@ if menu == "Black-Scholes":
     plt.tight_layout()
     st.pyplot(fig)
 
-elif menu == "Aproximación de Taylor":
+with tab2:
     # Código de la página de Aproximación de Taylor
     st.title("📈 Aproximación de Taylor")
+
+    # Ejemplos de funciones
+    st.markdown("""
+    **Ejemplos de funciones que puedes usar:**
+    - `sin(x)`
+    - `cos(x)`
+    - `exp(x)`
+    - `log(x)`
+    - `x**2 + 2*x + 1`
+    """)
 
     # Entrada de la función
     st.header("⚙️ Ingresa una función")
@@ -139,8 +155,11 @@ elif menu == "Aproximación de Taylor":
     x0 = st.slider("Punto de expansión (x0)", -10.0, 10.0, 0.0)
 
     # Rango de visualización
-    x_min = st.slider("Límite inferior de x", -10.0, 10.0, -5.0)
-    x_max = st.slider("Límite superior de x", -10.0, 10.0, 5.0)
+    col1, col2 = st.columns(2)
+    with col1:
+        x_min = st.slider("Límite inferior de x", -10.0, 10.0, -5.0)
+    with col2:
+        x_max = st.slider("Límite superior de x", -10.0, 10.0, 5.0)
 
     # Definir la variable simbólica
     x = sp.symbols('x')
@@ -159,6 +178,12 @@ elif menu == "Aproximación de Taylor":
         # Expansión de Taylor de grado 2
         taylor_2 = taylor_1 + (f_double_prime.subs(x, x0) / 2) * (x - x0)**2
 
+        # Mostrar las expansiones de Taylor en formato matemático
+        st.subheader("🔍 Expansiones de Taylor")
+        st.latex(f"f(x) = {sp.latex(f)}")
+        st.latex(f"T_1(x) = {sp.latex(taylor_1)}")
+        st.latex(f"T_2(x) = {sp.latex(taylor_2)}")
+
         # Convertir las funciones simbólicas a funciones numéricas
         f_np = sp.lambdify(x, f, "numpy")
         taylor_1_np = sp.lambdify(x, taylor_1, "numpy")
@@ -168,6 +193,7 @@ elif menu == "Aproximación de Taylor":
         x_vals = np.linspace(x_min, x_max, 500)
 
         # Graficar la función original y las aproximaciones de Taylor
+        st.subheader("📊 Gráficas")
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.plot(x_vals, f_np(x_vals), label=f"Función: {function_input}", color='blue')
         ax.plot(x_vals, taylor_1_np(x_vals), label="Taylor Grado 1", color='green', linestyle='--')
