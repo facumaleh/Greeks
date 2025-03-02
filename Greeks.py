@@ -2,9 +2,8 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-from scipy.stats import norm  # Importar norm desde scipy.stats
+from scipy.stats import norm
 import sympy as sp
-
 
 # Configuración de la página (DEBE SER LA PRIMERA LÍNEA DE STREAMLIT)
 st.set_page_config(
@@ -343,6 +342,7 @@ with tab2:
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
+
 # Página de Árbol Binomial
 with tab3:
     st.title("🌳 Valuación de Opciones con Árbol Binomial")
