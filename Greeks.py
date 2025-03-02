@@ -476,8 +476,18 @@ with tab4:
     """)
     st.markdown("Donde:")
     st.markdown(r"""
-    - \( C(S_0) = \) Precio de la opción call en \( S_0 \).
-    - \( \Delta(S_0) = \) Delta de la opción en \( S_0 \).
+    - \( C(S_0) \): Precio de la opción call en \( S_0 \).
+    - \( \Delta(S_0) \): Delta de la opción en \( S_0 \).
+    """)
+    
+    # Aproximación de Segundo Grado (Cuadrática)
+    st.markdown("**Aproximación de Segundo Grado (Cuadrática):**")
+    st.latex(r"""
+    C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0) + \frac{1}{2} \Gamma(S_0) \cdot (S - S_0)^2
+    """)
+    st.markdown("Donde:")
+    st.markdown(r"""
+    - \( \Gamma(S_0) \): Gamma de la opción en \( S_0 \).
     """)
     
     # Aproximación de Segundo Grado (Cuadrática)
