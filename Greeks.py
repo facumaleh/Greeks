@@ -26,12 +26,22 @@ st.markdown("""
 .css-1d391kg {
     background-color: #1E1E1E;
 }
+/* Ajustar el color del texto para que sea más legible */
+.stTextInput>div>div>input {
+    color: #FFFFFF;
+}
+.stSelectbox>div>div>div {
+    color: #FFFFFF;
+}
+.stMarkdown {
+    color: #FFFFFF;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # Menú de navegación lateral
 st.sidebar.title("Navegación")
-menu = st.sidebar.radio("Selecciona una página", ["Black-Scholes", "Aproximación de Taylor"])
+menu = st.sidebar.selectbox("Selecciona una página", ["Black-Scholes", "Aproximación de Taylor"])
 
 # Página de Black-Scholes
 if menu == "Black-Scholes":
