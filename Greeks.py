@@ -42,12 +42,13 @@ st.markdown("""
 st.title("Visualizador de Opciones Financieras")
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📊 Aproximación de Taylor", 
     "🌳 Árbol Binomial", 
     "📈 Black-Scholes", 
     "📉 Expansión de Taylor para Call",
-    "🔍 Optimización con Lagrange"
+    "🔍 Optimización con Lagrange",
+    "📉 Paridad Put-Call"
 ])
 
 # Página de Aproximación de Taylor
@@ -612,6 +613,68 @@ with tab4:
     
         except Exception as e:
             st.error(f"Error al procesar la función o la restricción: {e}")
+    # Página de Paridad Put-Call
+with tab6:
+    st.title("📉 Valor de un Put usando Paridad Put-Call")
+
+    # Descripción de la Paridad Put-Call
+    with st.expander("📚 ¿Qué es la Paridad Put-Call?"):
+        st.markdown("""
+        **Paridad Put-Call:**
+        - La paridad put-call es una relación entre el precio de una opción call y una opción put con el mismo precio de ejercicio y fecha de vencimiento.
+        - La fórmula de paridad put-call es:
+          \[
+          C + K e^{-rT} = P + S
+          \]
+          Donde:
+          - \(C\): Precio de la opción call.
+          - \(P\): Precio de la opción put.
+          - \(S\): Precio del activo subyacente.
+          - \(K\): Precio de ejercicio.
+          - \(r\): Tasa libre de riesgo.
+          - \(T\): Tiempo hasta el vencimiento.
+        - Esta relación se utiliza para calcular el precio de una opción put si se conoce el precio de la opción call, o viceversa.
+        """)
+
+    # Entrada de parámetros
+    st.header("⚙️ Parámetros de la Opción")
+    col1, col2 = st.columns(2)
+    with col1:
+        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01, key="put_call_parity_S")
+        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01, key="put_call_parity_K")
+        T = st.number_input("Tiempo hasta Vencimiento (T)", value=1.0, min_value=0.01, key="put_call_parity_T")
+    with col2:
+        r = st.number_input("Tasa Libre de Riesgo (r)", value=0.05, min_value=0.0, key="put_call_parity_r")
+        C = st.number_input("Precio de la Opción Call (C)", value=10.0, min_value=0.0, key="put_call_parity_C")
+
+    # Calcular el precio de la opción put usando la paridad put-call
+    def calcular_put_call_parity(S, K, T, r, C):
+        P = C + K * np.exp(-r * T) - S
+        return P
+
+    # Calcular el precio de la opción put
+    P = calcular_put_call_parity(S, K, T, r, C)
+
+    # Mostrar el resultado
+    st.subheader("💵 Precio de la Opción Put")
+    st.markdown(f"**Precio de la Opción Put (P):** `{P:.4f}`")
+
+    # Mostrar la fórmula de paridad put-call
+    st.subheader("📝 Fórmula de Paridad Put-Call")
+    st.latex(r"""
+    P = C + K e^{-rT} - S
+    """)
+
+    # Explicación del cálculo
+    st.markdown("""
+    ### 🎯 Explicación del Cálculo
+    - **Precio de la Opción Call (C):** Precio de la opción call proporcionado por el usuario.
+    - **Precio del Activo (S):** Precio actual del activo subyacente.
+    - **Precio de Ejercicio (K):** Precio al que se puede ejercer la opción.
+    - **Tasa Libre de Riesgo (r):** Tasa de interés libre de riesgo.
+    - **Tiempo hasta Vencimiento (T):** Tiempo restante hasta el vencimiento de la opción.
+    - **Precio de la Opción Put (P):** Precio calculado de la opción put usando la fórmula de paridad put-call.
+    """)
 
 # Pie de página
 st.markdown("---")
