@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 import sympy as sp
+import plotly.graph_objects as go  # Para gráficos interactivos
+import yfinance as yf  # Para obtener datos de precios reales
+import pandas as pd
 
 # Configuración de la página
 st.set_page_config(
@@ -76,7 +79,7 @@ theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") ==
 apply_theme()
 
 # Menú de navegación con pestañas
-tab1, tab2 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor"])
+tab1, tab2, tab3 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor", "🆘 Ayuda"])
 
 # Página de Black-Scholes
 with tab1:
@@ -96,140 +99,83 @@ with tab1:
     st.header("⚙️ Parámetros de la Opción")
     col1, col2, col3 = st.columns(3)
     with col1:
-        S = st.slider("Precio del Activo (S)", 1.0, 200.0, 100.0)
+        S = st.slider("Precio del Activo (S)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.")
     with col2:
-        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0)
+        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se ejerce la opción.")
     with col3:
-        T = st.slider("Tiempo hasta vencimiento (T)", 0.1, 5.0, 1.0)
+        T = st.slider("Tiempo hasta vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.")
 
     col4, col5 = st.columns(2)
     with col4:
-        r = st.slider("Tasa libre de riesgo (r)", 0.0, 0.2, 0.05)
+        r = st.slider("Tasa libre de riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.")
     with col5:
-        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2)
+        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.")
 
-    # Fórmula de Black-Scholes para una opción call
-    def black_scholes_call(S, K, T, r, sigma):
+    # Selección de tipo de opción (Call o Put)
+    option_type = st.selectbox("Tipo de Opción", ["Call", "Put"], help="Selecciona si es una opción Call o Put.")
+
+    # Función de Black-Scholes (Call y Put)
+    @st.cache  # Almacenar en caché para mejorar el rendimiento
+    def black_scholes(S, K, T, r, sigma, option_type):
         d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
         d2 = d1 - sigma * np.sqrt(T)
-        call_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
-        return call_price
+        if option_type == "Call":
+            price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
+        else:
+            price = K * np.exp(-r * T) * norm.cdf(-d2) - S * norm.cdf(-d1)
+        return price
 
-    # Calcular el precio de la opción call
-    call_price = black_scholes_call(S, K, T, r, sigma)
+    # Calcular el precio de la opción
+    option_price = black_scholes(S, K, T, r, sigma, option_type)
 
     # Cálculo de las letras griegas
-    def delta_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        return norm.cdf(d1)
-
-    def gamma_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        return norm.pdf(d1) / (S * sigma * np.sqrt(T))
-
-    def theta_call(S, K, T, r, sigma):
+    @st.cache
+    def calculate_greeks(S, K, T, r, sigma, option_type):
         d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
         d2 = d1 - sigma * np.sqrt(T)
-        return - (S * norm.pdf(d1) * sigma) / (2 * np.sqrt(T)) - r * K * np.exp(-r * T) * norm.cdf(d2)
+        if option_type == "Call":
+            delta = norm.cdf(d1)
+            rho = K * T * np.exp(-r * T) * norm.cdf(d2)
+        else:
+            delta = -norm.cdf(-d1)
+            rho = -K * T * np.exp(-r * T) * norm.cdf(-d2)
+        gamma = norm.pdf(d1) / (S * sigma * np.sqrt(T))
+        theta = - (S * norm.pdf(d1) * sigma) / (2 * np.sqrt(T)) - r * K * np.exp(-r * T) * norm.cdf(d2)
+        vega = S * norm.pdf(d1) * np.sqrt(T)
+        return delta, gamma, theta, vega, rho
 
-    def vega_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        return S * norm.pdf(d1) * np.sqrt(T)
+    delta, gamma, theta, vega, rho = calculate_greeks(S, K, T, r, sigma, option_type)
 
-    def rho_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        d2 = d1 - sigma * np.sqrt(T)
-        return K * T * np.exp(-r * T) * norm.cdf(d2)
-
-    # Calcular las letras griegas
-    delta = delta_call(S, K, T, r, sigma)
-    gamma = gamma_call(S, K, T, r, sigma)
-    theta = theta_call(S, K, T, r, sigma)
-    vega = vega_call(S, K, T, r, sigma)
-    rho = rho_call(S, K, T, r, sigma)
+    # Mostrar el valor de la opción y las letras griegas en una sola fila
+    st.subheader("💵 Valor de la Opción y Letras Griegas")
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    with col1:
+        st.metric(f"Precio de la Opción {option_type}", f"{option_price:.4f}")
+    with col2:
+        st.metric("Δ Delta", f"{delta:.4f}")
+    with col3:
+        st.metric("Γ Gamma", f"{gamma:.4f}")
+    with col4:
+        st.metric("Θ Theta", f"{theta:.4f}")
+    with col5:
+        st.metric("ν Vega", f"{vega:.4f}")
+    with col6:
+        st.metric("ρ Rho", f"{rho:.4f}")
 
     # Gráficos de las letras griegas
-st.subheader("📊 Gráficas de las Letras Griegas")
-S_range = np.linspace(1, 200, 100)
-delta_values = delta_call(S_range, K, T, r, sigma)
-gamma_values = gamma_call(S_range, K, T, r, sigma)
-theta_values = theta_call(S_range, K, T, r, sigma)
-vega_values = vega_call(S_range, K, T, r, sigma)
-rho_values = rho_call(S_range, K, T, r, sigma)
+    st.subheader("📊 Gráficas de las Letras Griegas")
+    S_range = np.linspace(1, 200, 100)
+    delta_values, gamma_values, theta_values, vega_values, rho_values = calculate_greeks(S_range, K, T, r, sigma, option_type)
 
-# Organizar los gráficos en 5 columnas (una para cada gráfico)
-cols = st.columns(5)  # Cambia a 5 columnas
-
-with cols[0]:
-    fig1, ax1 = plt.subplots(figsize=(6, 4))
-    ax1.plot(S_range, delta_values, label='Delta', color='blue')
-    ax1.set_title('Δ Delta')
-    ax1.set_xlabel('Precio del Activo (S)')
-    ax1.set_ylabel('Delta')
-    ax1.grid(True)
-    st.pyplot(fig1)
-
-with cols[1]:
-    fig2, ax2 = plt.subplots(figsize=(6, 4))
-    ax2.plot(S_range, gamma_values, label='Gamma', color='orange')
-    ax2.set_title('Γ Gamma')
-    ax2.set_xlabel('Precio del Activo (S)')
-    ax2.set_ylabel('Gamma')
-    ax2.grid(True)
-    st.pyplot(fig2)
-
-with cols[2]:
-    fig3, ax3 = plt.subplots(figsize=(6, 4))
-    ax3.plot(S_range, theta_values, label='Theta', color='green')
-    ax3.set_title('Θ Theta')
-    ax3.set_xlabel('Precio del Activo (S)')
-    ax3.set_ylabel('Theta')
-    ax3.grid(True)
-    st.pyplot(fig3)
-
-with cols[3]:
-    fig4, ax4 = plt.subplots(figsize=(6, 4))
-    ax4.plot(S_range, vega_values, label='Vega', color='red')
-    ax4.set_title('ν Vega')
-    ax4.set_xlabel('Precio del Activo (S)')
-    ax4.set_ylabel('Vega')
-    ax4.grid(True)
-    st.pyplot(fig4)
-
-with cols[4]:
-    fig5, ax5 = plt.subplots(figsize=(6, 4))
-    ax5.plot(S_range, rho_values, label='Rho', color='purple')
-    ax5.set_title('ρ Rho')
-    ax5.set_xlabel('Precio del Activo (S)')
-    ax5.set_ylabel('Rho')
-    ax5.grid(True)
-    st.pyplot(fig5)
-
-  # Mostrar el valor de la opción y las letras griegas en una sola fila
-st.subheader("💵 Valor de la Opción Call y Letras Griegas")
-
-# Crear 6 columnas: 1 para el precio de la opción y 5 para las letras griegas
-col1, col2, col3, col4, col5, col6 = st.columns(6)
-
-# Precio de la opción Call
-with col1:
-    st.metric("Precio de la Opción Call", f"{call_price:.4f}")
-
-# Valores de las letras griegas
-with col2:
-    st.metric("Δ Delta", f"{delta:.4f}")
-
-with col3:
-    st.metric("Γ Gamma", f"{gamma:.4f}")
-
-with col4:
-    st.metric("Θ Theta", f"{theta:.4f}")
-
-with col5:
-    st.metric("ν Vega", f"{vega:.4f}")
-
-with col6:
-    st.metric("ρ Rho", f"{rho:.4f}")
+    # Usar Plotly para gráficos interactivos
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=S_range, y=delta_values, name="Δ Delta", line=dict(color="blue")))
+    fig.add_trace(go.Scatter(x=S_range, y=gamma_values, name="Γ Gamma", line=dict(color="orange")))
+    fig.add_trace(go.Scatter(x=S_range, y=theta_values, name="Θ Theta", line=dict(color="green")))
+    fig.add_trace(go.Scatter(x=S_range, y=vega_values, name="ν Vega", line=dict(color="red")))
+    fig.add_trace(go.Scatter(x=S_range, y=rho_values, name="ρ Rho", line=dict(color="purple")))
+    fig.update_layout(title="Letras Griegas", xaxis_title="Precio del Activo (S)", yaxis_title="Valor")
+    st.plotly_chart(fig, use_container_width=True)
 
 # Página de Aproximación de Taylor
 with tab2:
@@ -248,42 +194,13 @@ with tab2:
 
     # Configuración del gráfico
     st.header("⚙️ Configuración del gráfico")
-
     col1, col2, col3 = st.columns(3)
     with col1:
-        x0 = st.slider(
-            "Punto de expansión (x0)",
-            min_value=-15.0,
-            max_value=15.0,
-            value=0.01,
-            step=0.1,
-            help="Selecciona el punto alrededor del cual se calculará la expansión de Taylor."
-        )
+        x0 = st.slider("Punto de expansión (x0)", -15.0, 15.0, 0.01, help="Punto alrededor del cual se calcula la expansión.")
     with col2:
-        x_min = st.slider(
-            "Límite inferior de x",
-            min_value=-15.0,
-            max_value=15.0,
-            value=-5.0,
-            step=0.1,
-            help="Define el valor mínimo de x para el gráfico."
-        )
+        x_min = st.slider("Límite inferior de x", -15.0, 15.0, -5.0, help="Valor mínimo de x para el gráfico.")
     with col3:
-        x_max = st.slider(
-            "Límite superior de x",
-            min_value=-15.0,
-            max_value=15.0,
-            value=5.0,
-            step=0.1,
-            help="Define el valor máximo de x para el gráfico."
-        )
-
-    # Mostrar los valores seleccionados
-    st.markdown(f"""
-    - **Punto de expansión (x0):** `{x0}`
-    - **Límite inferior de x:** `{x_min}`
-    - **Límite superior de x:** `{x_max}`
-    """)
+        x_max = st.slider("Límite superior de x", -15.0, 15.0, 5.0, help="Valor máximo de x para el gráfico.")
 
     # Definir la variable simbólica
     x = sp.symbols('x')
@@ -296,10 +213,8 @@ with tab2:
         f_prime = sp.diff(f, x)  # Primera derivada
         f_double_prime = sp.diff(f_prime, x)  # Segunda derivada
 
-        # Expansión de Taylor de grado 1
+        # Expansión de Taylor de grado 1 y 2
         taylor_1 = f.subs(x, x0) + f_prime.subs(x, x0) * (x - x0)
-
-        # Expansión de Taylor de grado 2
         taylor_2 = taylor_1 + (f_double_prime.subs(x, x0) / 2) * (x - x0)**2
 
         # Mostrar las expansiones de Taylor en formato matemático
@@ -317,30 +232,31 @@ with tab2:
         x_vals = np.linspace(x_min, x_max, 500)
 
         # Evaluar las funciones en el rango de x
-        try:
-            y_vals = f_np(x_vals)
-            y_taylor_1 = taylor_1_np(x_vals)
-            y_taylor_2 = taylor_2_np(x_vals)
-        except Exception as e:
-            st.error(f"Error al evaluar la función: {e}")
-            st.stop()
+        y_vals = f_np(x_vals)
+        y_taylor_1 = taylor_1_np(x_vals)
+        y_taylor_2 = taylor_2_np(x_vals)
 
         # Graficar la función original y las aproximaciones de Taylor
         st.subheader("📊 Gráficas")
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.plot(x_vals, y_vals, label=f"Función: {function_input}", color='blue')
-        ax.plot(x_vals, y_taylor_1, label="Taylor Grado 1", color='green', linestyle='--')
-        ax.plot(x_vals, y_taylor_2, label="Taylor Grado 2", color='red', linestyle='--')
-        ax.axvline(x=x0, color='gray', linestyle=':', label=f"Punto de expansión (x0 = {x0})")
-        ax.set_title("Aproximación de Taylor")
-        ax.set_xlabel("x")
-        ax.set_ylabel("f(x)")
-        ax.legend()
-        ax.grid(True)
-        st.pyplot(fig)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=x_vals, y=y_vals, name=f"Función: {function_input}", line=dict(color="blue")))
+        fig.add_trace(go.Scatter(x=x_vals, y=y_taylor_1, name="Taylor Grado 1", line=dict(color="green", dash="dash")))
+        fig.add_trace(go.Scatter(x=x_vals, y=y_taylor_2, name="Taylor Grado 2", line=dict(color="red", dash="dash")))
+        fig.update_layout(title="Aproximación de Taylor", xaxis_title="x", yaxis_title="f(x)")
+        st.plotly_chart(fig, use_container_width=True)
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
+
+# Página de Ayuda
+with tab3:
+    st.title("🆘 Ayuda")
+    st.markdown("""
+    **Cómo usar esta aplicación:**
+    - **Black-Scholes:** Calcula el precio de una opción y sus letras griegas.
+    - **Aproximación de Taylor:** Aproxima una función usando expansiones de Taylor.
+    - **Modo Oscuro:** Actívalo para cambiar el tema de la aplicación.
+    """)
 
 # Pie de página
 st.markdown("---")
