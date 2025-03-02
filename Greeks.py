@@ -161,8 +161,8 @@ with tab2:
     with col2:
         x_min = st.slider(
             "Límite inferior de x",
-            min_value=-10.0,
-            max_value=10.0,
+            min_value=-15.0,
+            max_value=15.0,
             value=-5.0,  # Valor predeterminado
             step=0.1,    # Paso más pequeño para mayor precisión
             help="Define el valor mínimo de x para el gráfico."
@@ -170,8 +170,8 @@ with tab2:
     with col3:
         x_max = st.slider(
             "Límite superior de x",
-            min_value=-10.0,
-            max_value=10.0,
+            min_value=-15.0,
+            max_value=15.0,
             value=5.0,   # Valor predeterminado
             step=0.1,    # Paso más pequeño para mayor precisión
             help="Define el valor máximo de x para el gráfico."
