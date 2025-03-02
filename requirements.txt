@@ -1,7 +1,7 @@
-streamlit==1.26.0
-numpy==1.23.5
-matplotlib==3.6.2
-networkx==3.0
-scipy==1.9.3
-sympy==1.11.1
-plotly==5.11.0
+streamlit
+numpy
+matplotlib
+networkx
+scipy
+sympy
+plotly
