@@ -4,43 +4,68 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 import sympy as sp
 
-# Configurar la aplicación en pantalla completa
+# Configuración de la página
 st.set_page_config(layout="wide", page_title="Visualizador de Black-Scholes y Taylor")
 
-# Tema oscuro (opcional)
-st.markdown("""
-<style>
-.stApp {
-    background-color: #1E1E1E;
-    color: #FFFFFF;
-}
-.stSlider>div>div>div>div {
-    background-color: #4CAF50;
-}
-.st-bb {
-    background-color: transparent;
-}
-.st-at {
-    background-color: transparent;
-}
-.css-1d391kg {
-    background-color: #1E1E1E;
-}
-/* Ajustar el color del texto para que sea más legible */
-.stTextInput>div>div>input {
-    color: #FFFFFF;
-}
-.stSelectbox>div>div>div {
-    color: #FFFFFF;
-}
-.stMarkdown {
-    color: #FFFFFF;
-}
-</style>
-""", unsafe_allow_html=True)
+# Función para cambiar entre modo claro y oscuro
+def toggle_theme():
+    if st.session_state.get("theme", "light") == "light":
+        st.session_state.theme = "dark"
+    else:
+        st.session_state.theme = "light"
 
-# Menú de navegación lateral
-st.sidebar.title("Navegación")
+# Aplicar el tema seleccionado
+def apply_theme():
+    theme = st.session_state.get("theme", "light")
+    if theme == "dark":
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #FFFFFF;
+        }
+        .stSelectbox>div>div>div {
+            color: #FFFFFF;
+        }
+        .stMarkdown {
+            color: #FFFFFF;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #000000;
+        }
+        .stSelectbox>div>div>div {
+            color: #000000;
+        }
+        .stMarkdown {
+            color: #000000;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# Barra lateral para navegación y selección de tema
+st.sidebar.title("Configuración")
+theme = st.sidebar.radio("Selecciona el tema", ["Modo Claro", "Modo Oscuro"], key="theme_selector", on_change=toggle_theme)
+apply_theme()
+
+# Menú de navegación
 menu = st.sidebar.selectbox("Selecciona una página", ["Black-Scholes", "Aproximación de Taylor"])
 
 # Página de Black-Scholes
@@ -194,8 +219,8 @@ elif menu == "Aproximación de Taylor":
             "Punto de expansión (x0)",
             min_value=-15.0,
             max_value=15.0,
-            value=0.01,  # Valor predeterminado
-            step=0.1,   # Paso más pequeño para mayor precisión
+            value=0.01,
+            step=0.1,
             help="Selecciona el punto alrededor del cual se calculará la expansión de Taylor."
         )
     with col2:
@@ -203,8 +228,8 @@ elif menu == "Aproximación de Taylor":
             "Límite inferior de x",
             min_value=-15.0,
             max_value=15.0,
-            value=-5.0,  # Valor predeterminado
-            step=0.1,    # Paso más pequeño para mayor precisión
+            value=-5.0,
+            step=0.1,
             help="Define el valor mínimo de x para el gráfico."
         )
     with col3:
@@ -212,8 +237,8 @@ elif menu == "Aproximación de Taylor":
             "Límite superior de x",
             min_value=-15.0,
             max_value=15.0,
-            value=5.0,   # Valor predeterminado
-            step=0.1,    # Paso más pequeño para mayor precisión
+            value=5.0,
+            step=0.1,
             help="Define el valor máximo de x para el gráfico."
         )
 
