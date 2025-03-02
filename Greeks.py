@@ -343,7 +343,7 @@ with tab2:
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
-
+# Página de Árbol Binomial
 with tab3:
     st.title("🌳 Valuación de Opciones con Árbol Binomial")
 
