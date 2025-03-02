@@ -344,6 +344,87 @@ with tab2:
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
 
+import streamlit as st
+import numpy as np
+import matplotlib.pyplot as plt
+import networkx as nx
+from scipy.stats import norm
+import sympy as sp
+
+# Configuración de la página (DEBE SER LA PRIMERA LÍNEA DE STREAMLIT)
+st.set_page_config(
+    layout="wide",
+    page_title="Visualizador de Black-Scholes, Taylor y Binomial",
+    page_icon="📊"
+)
+
+# Función para cambiar entre modo claro y oscuro
+def toggle_theme():
+    if st.session_state.get("theme", "light") == "light":
+        st.session_state.theme = "dark"
+    else:
+        st.session_state.theme = "light"
+
+# Aplicar el tema seleccionado
+def apply_theme():
+    theme = st.session_state.get("theme", "light")
+    if theme == "dark":
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #FFFFFF;
+        }
+        .stSelectbox>div>div>div {
+            color: #FFFFFF;
+        }
+        .stMarkdown {
+            color: #FFFFFF;
+        }
+        .css-1d391kg {
+            background-color: #1E1E1E;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <style>
+        .stApp {
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+        .stSlider>div>div>div>div {
+            background-color: #4CAF50;
+        }
+        .stTextInput>div>div>input {
+            color: #000000;
+        }
+        .stSelectbox>div>div>div {
+            color: #000000;
+        }
+        .stMarkdown {
+            color: #000000;
+        }
+        .css-1d391kg {
+            background-color: #FFFFFF;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# Selección de tema en el cuerpo principal
+st.title("Visualizador de Black-Scholes, Taylor y Binomial")
+theme = st.toggle("Modo Oscuro", value=st.session_state.get("theme", "light") == "dark", on_change=toggle_theme)
+apply_theme()
+
+# Menú de navegación con pestañas
+tab1, tab2, tab3 = st.tabs(["📈 Black-Scholes", "📊 Aproximación de Taylor", "🌳 Árbol Binomial"])
+
 # Página de Árbol Binomial
 with tab3:
     st.title("🌳 Valuación de Opciones con Árbol Binomial")
@@ -359,13 +440,13 @@ with tab3:
     st.header("⚙️ Parámetros del Modelo")
     col1, col2 = st.columns(2)
     with col1:
-        S = st.number_input("Precio del Activo (S)", value=10.0, min_value=0.01)
-        K = st.number_input("Precio de Ejercicio (K)", value=10.0, min_value=0.01)
-        U = st.number_input("Factor de Subida (U)", value=2.0, min_value=1.0)
+        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01)
+        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01)
+        U = st.number_input("Factor de Subida (U)", value=1.1, min_value=1.0)
     with col2:
-        D = st.number_input("Factor de Bajada (D)", value=0.5, max_value=1.0)
-        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.0, min_value=1.0)
-        periods = st.number_input("Número de Periodos", value=2, min_value=1)
+        D = st.number_input("Factor de Bajada (D)", value=0.9, max_value=1.0)
+        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.05, min_value=1.0)
+        periods = st.number_input("Número de Periodos", value=3, min_value=1)
 
     # Función para calcular el precio de la opción call usando árbol binomial
     def binomial_tree_call(S, K, U, D, R, periods):
