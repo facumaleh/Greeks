@@ -42,11 +42,12 @@ st.markdown("""
 st.title("Visualizador de Opciones Financieras")
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊 Aproximación de Taylor", 
     "🌳 Árbol Binomial", 
     "📈 Black-Scholes", 
-    "📉 Expansión de Taylor para Call"
+    "📉 Expansión de Taylor para Call",
+    "🔍 Optimización con Lagrange"
 ])
 
 # Página de Aproximación de Taylor
@@ -547,6 +548,70 @@ with tab4:
     - **Áreas en rojo claro:** Indican donde el polinomio de Taylor **subestima** el precio real de la opción.
     - **Áreas en verde claro:** Indican donde el polinomio de Taylor **sobrestima** el precio real de la opción.
     """)
+
+
+    # Página de Optimización con Lagrange
+    with tab5:
+        st.title("🔍 Optimización con Método de Lagrange")
+    
+        # Descripción del método de Lagrange
+        with st.expander("📚 ¿Qué es el Método de Lagrange?"):
+            st.markdown("""
+            **Método de Lagrange:**
+            - El método de Lagrange se utiliza para encontrar los extremos de una función sujeta a restricciones.
+            - Se introduce un multiplicador de Lagrange (\(\lambda\)) para incorporar la restricción en la función objetivo.
+            - El sistema de ecuaciones se resuelve para encontrar los valores óptimos de \(x\), \(y\) y \(\lambda\).
+            """)
+    
+        # Entrada de la función objetivo y la restricción
+        st.header("⚙️ Ingresa la Función Objetivo y la Restricción")
+        col1, col2 = st.columns(2)
+        with col1:
+            funcion_objetivo = st.text_input("Función Objetivo (f(x, y)):", "x**2 + y**2", key="lagrange_funcion_objetivo")
+        with col2:
+            restriccion = st.text_input("Restricción (g(x, y) = 0):", "x + y - 1", key="lagrange_restriccion")
+    
+        # Definir las variables simbólicas
+        x, y, lambda_ = sp.symbols('x y lambda')
+    
+        try:
+            # Convertir las entradas del usuario en funciones simbólicas
+            f = sp.sympify(funcion_objetivo)
+            g = sp.sympify(restriccion)
+    
+            # Construir la función de Lagrange
+            L = f - lambda_ * g
+    
+            # Calcular las derivadas parciales
+            dL_dx = sp.diff(L, x)
+            dL_dy = sp.diff(L, y)
+            dL_dlambda = sp.diff(L, lambda_)
+    
+            # Mostrar las derivadas parciales
+            st.subheader("📝 Derivadas Parciales")
+            st.latex(f"\\frac{{\\partial L}}{{\\partial x}} = {sp.latex(dL_dx)}")
+            st.latex(f"\\frac{{\\partial L}}{{\\partial y}} = {sp.latex(dL_dy)}")
+            st.latex(f"\\frac{{\\partial L}}{{\\partial \\lambda}} = {sp.latex(dL_dlambda)}")
+    
+            # Resolver el sistema de ecuaciones
+            st.subheader("🔍 Solución del Sistema de Ecuaciones")
+            soluciones = sp.solve([dL_dx, dL_dy, dL_dlambda], (x, y, lambda_), dict=True)
+    
+            if soluciones:
+                for i, sol in enumerate(soluciones):
+                    st.markdown(f"**Solución {i + 1}:**")
+                    st.latex(f"x = {sp.latex(sol[x])}")
+                    st.latex(f"y = {sp.latex(sol[y])}")
+                    st.latex(f"\\lambda = {sp.latex(sol[lambda_])}")
+    
+                    # Evaluar la función objetivo en la solución
+                    valor_optimo = f.subs({x: sol[x], y: sol[y]})
+                    st.markdown(f"**Valor Óptimo de la Función Objetivo:** `{valor_optimo:.4f}`")
+            else:
+                st.error("No se encontraron soluciones para el sistema de ecuaciones.")
+    
+        except Exception as e:
+            st.error(f"Error al procesar la función o la restricción: {e}")
 
 # Pie de página
 st.markdown("---")
