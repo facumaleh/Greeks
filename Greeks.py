@@ -195,23 +195,23 @@ with tab2:
     # Calcular el árbol binomial
     asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
 
-    # Función para graficar un árbol binomial
-    def plot_binomial_tree(values, title, ax):
-        G = nx.Graph()
-        pos = {}
-        labels = {}
-        for i in range(values.shape[0]):
-            for j in range(i + 1):
-                node = (i, j)
-                G.add_node(node)
-                pos[node] = (i, -j + i / 2)  # Ajustar la posición vertical
-                labels[node] = f"{values[i, j]:.2f}"
-                if i > 0:
-                    parent = (i - 1, j) if j < i else (i - 1, j - 1)
-                    G.add_edge(parent, node)
+   # Función para graficar un árbol binomial
+def plot_binomial_tree(values, title, ax):
+    G = nx.Graph()
+    pos = {}
+    labels = {}
+    for i in range(values.shape[0]):
+        for j in range(i + 1):
+            node = (i, j)
+            G.add_node(node)
+            pos[node] = (i, -j + i / 2)  # Ajustar la posición vertical
+            labels[node] = f"{values[i, j]:.4f}"  # Mostrar valores con 4 decimales
+            if i > 0:
+                parent = (i - 1, j) if j < i else (i - 1, j - 1)
+                G.add_edge(parent, node)
 
-        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="red", font_size=10, font_weight="bold", ax=ax)
-        ax.set_title(title)
+    nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="red", font_size=10, font_weight="bold", ax=ax)
+    ax.set_title(title)
 
     # Mostrar los árboles binomiales uno al lado del otro
     st.subheader("📊 Árboles Binomiales")
