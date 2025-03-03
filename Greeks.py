@@ -53,6 +53,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 
 # Página de Aproximación de Taylor
 # Página de Aproximación de Taylor
+# Página de Aproximación de Taylor
 with tab1:
     st.title("📊 Aproximación de Taylor")
 
@@ -71,15 +72,76 @@ with tab1:
     # Configuración del gráfico
     st.header("⚙️ Configuración del gráfico")
     col1, col2, col3 = st.columns(3)
+
+    # Sincronización del slider y el número para x0
     with col1:
-        x0_slider = st.slider("Punto de expansión (x0)", -15.0, 15.0, 0.01, 0.1, help="Punto alrededor del cual se calculará la expansión de Taylor.", key="taylor_x0_slider")
-        x0 = st.number_input("Ingresa el valor de x0", value=x0_slider, format="%.4f", key="taylor_x0_input")
+        if "x0" not in st.session_state:
+            st.session_state.x0 = 0.01  # Valor inicial
+
+        x0_slider = st.slider(
+            "Punto de expansión (x0)", -15.0, 15.0, st.session_state.x0, 0.1,
+            help="Punto alrededor del cual se calculará la expansión de Taylor.",
+            key="taylor_x0_slider"
+        )
+        x0_input = st.number_input(
+            "Ingresa el valor de x0", value=st.session_state.x0, format="%.4f",
+            key="taylor_x0_input"
+        )
+
+        # Actualizar el valor en session_state si el usuario cambia el número o el slider
+        if x0_input != st.session_state.x0:
+            st.session_state.x0 = x0_input
+        if x0_slider != st.session_state.x0:
+            st.session_state.x0 = x0_slider
+
+    # Sincronización del slider y el número para x_min
     with col2:
-        x_min_slider = st.slider("Límite inferior de x", -15.0, 15.0, -5.0, 0.1, help="Valor mínimo de x para el gráfico.", key="taylor_x_min_slider")
-        x_min = st.number_input("Ingresa el límite inferior de x", value=x_min_slider, format="%.4f", key="taylor_x_min_input")
+        if "x_min" not in st.session_state:
+            st.session_state.x_min = -5.0  # Valor inicial
+
+        x_min_slider = st.slider(
+            "Límite inferior de x", -15.0, 15.0, st.session_state.x_min, 0.1,
+            help="Valor mínimo de x para el gráfico.",
+            key="taylor_x_min_slider"
+        )
+        x_min_input = st.number_input(
+            "Ingresa el límite inferior de x", value=st.session_state.x_min, format="%.4f",
+            key="taylor_x_min_input"
+        )
+
+        # Actualizar el valor en session_state si el usuario cambia el número o el slider
+        if x_min_input != st.session_state.x_min:
+            st.session_state.x_min = x_min_input
+        if x_min_slider != st.session_state.x_min:
+            st.session_state.x_min = x_min_slider
+
+    # Sincronización del slider y el número para x_max
     with col3:
-        x_max_slider = st.slider("Límite superior de x", -15.0, 15.0, 5.0, 0.1, help="Valor máximo de x para el gráfico.", key="taylor_x_max_slider")
-        x_max = st.number_input("Ingresa el límite superior de x", value=x_max_slider, format="%.4f", key="taylor_x_max_input")
+        if "x_max" not in st.session_state:
+            st.session_state.x_max = 5.0  # Valor inicial
+
+        x_max_slider = st.slider(
+            "Límite superior de x", -15.0, 15.0, st.session_state.x_max, 0.1,
+            help="Valor máximo de x para el gráfico.",
+            key="taylor_x_max_slider"
+        )
+        x_max_input = st.number_input(
+            "Ingresa el límite superior de x", value=st.session_state.x_max, format="%.4f",
+            key="taylor_x_max_input"
+        )
+
+        # Actualizar el valor en session_state si el usuario cambia el número o el slider
+        if x_max_input != st.session_state.x_max:
+            st.session_state.x_max = x_max_input
+        if x_max_slider != st.session_state.x_max:
+            st.session_state.x_max = x_max_slider
+
+    # Usar los valores de session_state para el cálculo
+    x0 = st.session_state.x0
+    x_min = st.session_state.x_min
+    x_max = st.session_state.x_max
+
+    # Resto del código de la hoja 1...
     # Definir la variable simbólica
     x = sp.symbols('x')
 
