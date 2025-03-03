@@ -380,21 +380,21 @@ with tab4:
         - Aca se calcula la expansión de Taylor de primer y segundo orden.
         """)
 
-    # Controles para los parámetros de la opción
-    with st.expander("⚙️ Parámetros de la Opción"):
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="taylor_S0")
-        with col2:
-            K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="taylor_K")
-        with col3:
-            T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="taylor_T")
+    # Controles para los parámetros de la opción (ahora siempre visibles)
+    st.header("⚙️ Parámetros de la Opción")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="taylor_S0")
+    with col2:
+        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="taylor_K")
+    with col3:
+        T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="taylor_T")
 
-        col4, col5 = st.columns(2)
-        with col4:
-            r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="taylor_r")
-        with col5:
-            sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="taylor_sigma")
+    col4, col5 = st.columns(2)
+    with col4:
+        r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="taylor_r")
+    with col5:
+        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="taylor_sigma")
 
     # Calcular el precio de la opción call usando Black-Scholes
     def black_scholes_call(S, K, T, r, sigma):
