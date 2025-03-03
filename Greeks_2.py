@@ -434,9 +434,8 @@ with tab4:
     # Calcular el precio real de la opción call para el rango de precios
     call_prices = [black_scholes_call(S, K, T, r, sigma) for S in S_range]
 
-    # Mostrar las ecuaciones de la expansión de Taylor
-    st.subheader("📝 Ecuaciones de la Expansión de Taylor")
-    
+   # Mostrar las ecuaciones de la expansión de Taylor dentro de un expander
+with st.expander("📝 Ecuaciones de la Expansión de Taylor"):
     # Aproximación de Primer Grado (Lineal)
     st.markdown("**Aproximación de Primer Grado (Lineal):**")
     st.latex(r"""
