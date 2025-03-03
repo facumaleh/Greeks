@@ -380,21 +380,21 @@ with tab4:
         - Aca se calcula la expansión de Taylor de primer y segundo orden.
         """)
 
-    # Controles para los parámetros de la opción (ahora siempre visibles)
-    st.header("⚙️ Parámetros de la Opción")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="taylor_S0")
-    with col2:
-        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="taylor_K")
-    with col3:
-        T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="taylor_T")
+    # Controles para los parámetros de la opción
+    with st.expander("⚙️ Parámetros de la Opción"):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="taylor_S0")
+        with col2:
+            K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="taylor_K")
+        with col3:
+            T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="taylor_T")
 
-    col4, col5 = st.columns(2)
-    with col4:
-        r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="taylor_r")
-    with col5:
-        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="taylor_sigma")
+        col4, col5 = st.columns(2)
+        with col4:
+            r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="taylor_r")
+        with col5:
+            sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="taylor_sigma")
 
     # Calcular el precio de la opción call usando Black-Scholes
     def black_scholes_call(S, K, T, r, sigma):
@@ -434,8 +434,9 @@ with tab4:
     # Calcular el precio real de la opción call para el rango de precios
     call_prices = [black_scholes_call(S, K, T, r, sigma) for S in S_range]
 
-  # Mostrar las ecuaciones de la expansión de Taylor dentro de un expander
-with st.expander("📝 Ecuaciones de la Expansión de Taylor"):
+    # Mostrar las ecuaciones de la expansión de Taylor
+    st.subheader("📝 Ecuaciones de la Expansión de Taylor")
+    
     # Aproximación de Primer Grado (Lineal)
     st.markdown("**Aproximación de Primer Grado (Lineal):**")
     st.latex(r"""
@@ -447,8 +448,9 @@ with st.expander("📝 Ecuaciones de la Expansión de Taylor"):
     st.latex(r"""
     C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0) + \frac{1}{2} \Gamma(S_0) \cdot (S - S_0)^2
     """)
+  
 
-    # Graficar la expansión de Taylor y el precio real de la opción (siempre visible)
+    # Graficar la expansión de Taylor y el precio real de la opción
     st.subheader("📊 Gráfica de la Expansión de Taylor")
     
     # Crear la figura con Plotly
@@ -549,7 +551,7 @@ with st.expander("📝 Ecuaciones de la Expansión de Taylor"):
     - **Áreas en rojo claro:** Indican donde el polinomio de Taylor **subestima** el precio real de la opción.
     - **Áreas en verde claro:** Indican donde el polinomio de Taylor **sobrestima** el precio real de la opción.
     """)
-    
+
     # Página de Optimización con Lagrange
     with tab5:
         st.title("🔍 Optimización con Método de Lagrange")
