@@ -380,21 +380,21 @@ with tab4:
         - Aca se calcula la expansión de Taylor de primer y segundo orden.
         """)
 
-    # Controles para los parámetros de la opción
-    with st.expander("⚙️ Parámetros de la Opción"):
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="taylor_S0")
-        with col2:
-            K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="taylor_K")
-        with col3:
-            T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="taylor_T")
+    # Controles para los parámetros de la opción (siempre visibles)
+    st.header("⚙️ Parámetros de la Opción")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="taylor_S0")
+    with col2:
+        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="taylor_K")
+    with col3:
+        T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="taylor_T")
 
-        col4, col5 = st.columns(2)
-        with col4:
-            r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="taylor_r")
-        with col5:
-            sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="taylor_sigma")
+    col4, col5 = st.columns(2)
+    with col4:
+        r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="taylor_r")
+    with col5:
+        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="taylor_sigma")
 
     # Calcular el precio de la opción call usando Black-Scholes
     def black_scholes_call(S, K, T, r, sigma):
@@ -434,28 +434,26 @@ with tab4:
     # Calcular el precio real de la opción call para el rango de precios
     call_prices = [black_scholes_call(S, K, T, r, sigma) for S in S_range]
 
-    # Mostrar las ecuaciones de la expansión de Taylor
-    st.subheader("📝 Ecuaciones de la Expansión de Taylor")
-    
-    # Aproximación de Primer Grado (Lineal)
-    st.markdown("**Aproximación de Primer Grado (Lineal):**")
-    st.latex(r"""
-    C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0)
-    """)
-  
-    # Aproximación de Segundo Grado (Cuadrática)
-    st.markdown("**Aproximación de Segundo Grado (Cuadrática):**")
-    st.latex(r"""
-    C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0) + \frac{1}{2} \Gamma(S_0) \cdot (S - S_0)^2
-    """)
-  
+    # Mostrar las ecuaciones de la expansión de Taylor dentro de un expander
+    with st.expander("📝 Ecuaciones de la Expansión de Taylor"):
+        # Aproximación de Primer Grado (Lineal)
+        st.markdown("**Aproximación de Primer Grado (Lineal):**")
+        st.latex(r"""
+        C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0)
+        """)
+      
+        # Aproximación de Segundo Grado (Cuadrática)
+        st.markdown("**Aproximación de Segundo Grado (Cuadrática):**")
+        st.latex(r"""
+        C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0) + \frac{1}{2} \Gamma(S_0) \cdot (S - S_0)^2
+        """)
 
-    # Graficar la expansión de Taylor y el precio real de la opción
+    # Graficar la expansión de Taylor y el precio real de la opción (siempre visible)
     st.subheader("📊 Gráfica de la Expansión de Taylor")
-    
+
     # Crear la figura con Plotly
     fig = go.Figure()
-    
+
     # Precio real de la opción
     fig.add_trace(go.Scatter(
         x=S_range,
@@ -464,7 +462,7 @@ with tab4:
         name='Precio Real de la Opción',
         line=dict(color='blue', width=2)
     ))
-    
+
     # Aproximación de Taylor de primer grado
     fig.add_trace(go.Scatter(
         x=S_range,
@@ -473,7 +471,7 @@ with tab4:
         name='Taylor Primer Orden',
         line=dict(color='green', dash='dash', width=2)
     ))
-    
+
     # Aproximación de Taylor de segundo grado
     fig.add_trace(go.Scatter(
         x=S_range,
@@ -482,7 +480,7 @@ with tab4:
         name='Taylor Segundo Orden',
         line=dict(color='red', dash='dash', width=2)
     ))
-    
+
     # Resaltar áreas donde el polinomio subestima o sobreestima
     fig.add_trace(go.Scatter(
         x=S_range,
@@ -493,7 +491,7 @@ with tab4:
         fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
         showlegend=False
     ))
-    
+
     fig.add_trace(go.Scatter(
         x=S_range,
         y=np.maximum(call_prices, taylor_1_values),  # Área donde Taylor 1 sobreestima
@@ -503,7 +501,7 @@ with tab4:
         fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
         showlegend=False
     ))
-    
+
     fig.add_trace(go.Scatter(
         x=S_range,
         y=np.minimum(call_prices, taylor_2_values),  # Área donde Taylor 2 subestima
@@ -513,7 +511,7 @@ with tab4:
         fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
         showlegend=False
     ))
-    
+
     fig.add_trace(go.Scatter(
         x=S_range,
         y=np.maximum(call_prices, taylor_2_values),  # Área donde Taylor 2 sobreestima
@@ -523,7 +521,7 @@ with tab4:
         fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
         showlegend=False
     ))
-    
+
     # Línea vertical en el punto de expansión (S₀)
     fig.add_vline(
         x=S0,
@@ -531,7 +529,7 @@ with tab4:
         annotation_text=f"S₀ = {S0}",
         annotation_position="top right"
     )
-    
+
     # Configuración del layout
     fig.update_layout(
         title="Expansión de Taylor para una Opción Call",
@@ -541,10 +539,10 @@ with tab4:
         legend=dict(x=0.02, y=0.98),  # Posición de la leyenda
         margin=dict(l=20, r=20, t=40, b=20)
     )
-    
+
     # Mostrar la gráfica
     st.plotly_chart(fig, use_container_width=True)
-    
+
     # Explicación de las áreas
     st.markdown("""
     ### 🎯 Áreas de Subestimación y Sobrestimación
