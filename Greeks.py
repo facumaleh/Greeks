@@ -52,6 +52,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 ])
 
 # Página de Aproximación de Taylor
+# Página de Aproximación de Taylor
 with tab1:
     st.title("📊 Aproximación de Taylor")
 
@@ -71,12 +72,14 @@ with tab1:
     st.header("⚙️ Configuración del gráfico")
     col1, col2, col3 = st.columns(3)
     with col1:
-        x0 = st.slider("Punto de expansión (x0)", -15.0, 15.0, 0.01, 0.1, help="Punto alrededor del cual se calculará la expansión de Taylor.", key="taylor_x0")
+        x0_slider = st.slider("Punto de expansión (x0)", -15.0, 15.0, 0.01, 0.1, help="Punto alrededor del cual se calculará la expansión de Taylor.", key="taylor_x0_slider")
+        x0 = st.number_input("Ingresa el valor de x0", value=x0_slider, format="%.4f", key="taylor_x0_input")
     with col2:
-        x_min = st.slider("Límite inferior de x", -15.0, 15.0, -5.0, 0.1, help="Valor mínimo de x para el gráfico.", key="taylor_x_min")
+        x_min_slider = st.slider("Límite inferior de x", -15.0, 15.0, -5.0, 0.1, help="Valor mínimo de x para el gráfico.", key="taylor_x_min_slider")
+        x_min = st.number_input("Ingresa el límite inferior de x", value=x_min_slider, format="%.4f", key="taylor_x_min_input")
     with col3:
-        x_max = st.slider("Límite superior de x", -15.0, 15.0, 5.0, 0.1, help="Valor máximo de x para el gráfico.", key="taylor_x_max")
-
+        x_max_slider = st.slider("Límite superior de x", -15.0, 15.0, 5.0, 0.1, help="Valor máximo de x para el gráfico.", key="taylor_x_max_slider")
+        x_max = st.number_input("Ingresa el límite superior de x", value=x_max_slider, format="%.4f", key="taylor_x_max_input")
     # Definir la variable simbólica
     x = sp.symbols('x')
 
