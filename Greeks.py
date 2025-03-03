@@ -128,67 +128,70 @@ with tab1:
         st.plotly_chart(fig, use_container_width=True)
 
         # Explicación paso a paso
-        st.subheader("📝 Explicación Paso a Paso")
+st.subheader("📝 Explicación Paso a Paso")
 
-        st.markdown("""
-        ### **1. Cálculo de las Derivadas**
-        - **Primera Derivada (\( f'(x) \)):**
-          \[
-          f'(x) = \frac{d}{dx} \left( f(x) \right)
-          \]
-          En este caso:
-          \[
-          f'(x) = {sp.latex(f_prime)}
-          \]
+st.markdown("""
+### **1. Cálculo de las Derivadas**
 
-        - **Segunda Derivada (\( f''(x) \)):**
-          \[
-          f''(x) = \frac{d}{dx} \left( f'(x) \right)
-          \]
-          En este caso:
-          \[
-          f''(x) = {sp.latex(f_double_prime)}
-          \]
-        """)
+- **Primera Derivada (\( f'(x) \)):**
+  \[
+  f'(x) = \frac{d}{dx} \left( f(x) \right)
+  \]
+  En este caso:
+  \[
+  f'(x) = {sp.latex(f_prime)}
+  \]
 
-        st.markdown("""
-        ### **2. Evaluación de las Derivadas en \( x_0 \)**
-        - **Valor de \( f(x_0) \):**
-          \[
-          f(x_0) = {sp.latex(f.subs(x, x0))}
-          \]
+- **Segunda Derivada (\( f''(x) \)):**
+  \[
+  f''(x) = \frac{d}{dx} \left( f'(x) \right)
+  \]
+  En este caso:
+  \[
+  f''(x) = {sp.latex(f_double_prime)}
+  \]
+""")
 
-        - **Valor de \( f'(x_0) \):**
-          \[
-          f'(x_0) = {sp.latex(f_prime.subs(x, x0))}
-          \]
+st.markdown("""
+### **2. Evaluación de las Derivadas en \( x_0 \)**
 
-        - **Valor de \( f''(x_0) \):**
-          \[
-          f''(x_0) = {sp.latex(f_double_prime.subs(x, x0))}
-          \]
-        """)
+- **Valor de \( f(x_0) \):**
+  \[
+  f(x_0) = {sp.latex(f.subs(x, x0))}
+  \]
 
-        st.markdown("""
-        ### **3. Construcción de los Polinomios de Taylor**
-        - **Polinomio de Taylor de Grado 1 (\( T_1(x) \)):**
-          \[
-          T_1(x) = f(x_0) + f'(x_0) \cdot (x - x_0)
-          \]
-          Sustituyendo los valores:
-          \[
-          T_1(x) = {sp.latex(f.subs(x, x0))} + {sp.latex(f_prime.subs(x, x0))} \cdot (x - {x0})
-          \]
+- **Valor de \( f'(x_0) \):**
+  \[
+  f'(x_0) = {sp.latex(f_prime.subs(x, x0))}
+  \]
 
-        - **Polinomio de Taylor de Grado 2 (\( T_2(x) \)):**
-          \[
-          T_2(x) = T_1(x) + \frac{1}{2} f''(x_0) \cdot (x - x_0)^2
-          \]
-          Sustituyendo los valores:
-          \[
-          T_2(x) = {sp.latex(taylor_1)} + \frac{{1}}{{2}} \cdot {sp.latex(f_double_prime.subs(x, x0))} \cdot (x - {x0})^2
-          \]
-        """)
+- **Valor de \( f''(x_0) \):**
+  \[
+  f''(x_0) = {sp.latex(f_double_prime.subs(x, x0))}
+  \]
+""")
+
+st.markdown("""
+### **3. Construcción de los Polinomios de Taylor**
+
+- **Polinomio de Taylor de Grado 1 (\( T_1(x) \)):**
+  \[
+  T_1(x) = f(x_0) + f'(x_0) \cdot (x - x_0)
+  \]
+  Sustituyendo los valores:
+  \[
+  T_1(x) = {sp.latex(f.subs(x, x0))} + {sp.latex(f_prime.subs(x, x0))} \cdot (x - {x0})
+  \]
+
+- **Polinomio de Taylor de Grado 2 (\( T_2(x) \)):**
+  \[
+  T_2(x) = T_1(x) + \frac{1}{2} f''(x_0) \cdot (x - x_0)^2
+  \]
+  Sustituyendo los valores:
+  \[
+  T_2(x) = {sp.latex(taylor_1)} + \frac{{1}}{{2}} \cdot {sp.latex(f_double_prime.subs(x, x0))} \cdot (x - {x0})^2
+  \]
+""")
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
