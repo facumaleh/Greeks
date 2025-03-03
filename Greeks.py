@@ -151,14 +151,14 @@ with tab2:
     st.header("⚙️ Parámetros del Modelo")
     col1, col2 = st.columns(2)
     with col1:
-        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01, key="binomial_S")
-        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01, key="binomial_K")
-        U = st.number_input("Factor de Subida (U)", value=1.1, min_value=1.0, key="binomial_U")
+        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01, format="%.4f", key="binomial_S")
+        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01, format="%.4f", key="binomial_K")
+        U = st.number_input("Factor de Subida (U)", value=1.1, min_value=1.0, format="%.4f", key="binomial_U")
     with col2:
-        D = st.number_input("Factor de Bajada (D)", value=0.9, max_value=1.0, key="binomial_D")
-        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.05, min_value=1.0, key="binomial_R")
+        D = st.number_input("Factor de Bajada (D)", value=0.9, max_value=1.0, format="%.4f", key="binomial_D")
+        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.05, min_value=1.0, format="%.4f", key="binomial_R")
         periods = st.number_input("Número de Periodos", value=3, min_value=1, key="binomial_periods")
-
+        
     # Función para calcular el precio de la opción call usando árbol binomial
     def binomial_tree_call(S, K, U, D, R, periods):
         # Probabilidad neutral al riesgo
