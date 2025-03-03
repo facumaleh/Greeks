@@ -549,7 +549,7 @@ with st.expander("📝 Ecuaciones de la Expansión de Taylor"):
     - **Áreas en rojo claro:** Indican donde el polinomio de Taylor **subestima** el precio real de la opción.
     - **Áreas en verde claro:** Indican donde el polinomio de Taylor **sobrestima** el precio real de la opción.
     """)
-
+    
     # Página de Optimización con Lagrange
     with tab5:
         st.title("🔍 Optimización con Método de Lagrange")
