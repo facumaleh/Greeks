@@ -65,7 +65,7 @@ with tab1:
 
     # Entrada de la función
     st.header("⚙️ Ingresa una función")
-    function_input = st.text_input("Ingresa una función de x (por ejemplo, sin(x), exp(x), x**2):", "sin(x)", key="taylor_function_input")
+    function_input = st.text_input("Ingresa una función de x (por ejemplo, sin(x), exp(x), x**2):", "x*x", key="taylor_function_input")
 
     # Configuración del gráfico
     st.header("⚙️ Configuración del gráfico")
