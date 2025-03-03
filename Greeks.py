@@ -88,6 +88,13 @@ with tab1:
         f_prime = sp.diff(f, x)  # Primera derivada
         f_double_prime = sp.diff(f_prime, x)  # Segunda derivada
 
+        # Mostrar las derivadas
+        st.subheader("🔍 Derivadas de la Función")
+        st.markdown("**Primera Derivada:**")
+        st.latex(f"f'(x) = {sp.latex(f_prime)}")
+        st.markdown("**Segunda Derivada:**")
+        st.latex(f"f''(x) = {sp.latex(f_double_prime)}")
+
         # Expansión de Taylor de grado 1
         taylor_1 = f.subs(x, x0) + f_prime.subs(x, x0) * (x - x0)
 
