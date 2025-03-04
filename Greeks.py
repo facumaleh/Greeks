@@ -1232,15 +1232,17 @@ with tab8:
         st.error(f"Error al procesar la función: {e}")
 
 # Pestaña de Arbitraje Call-Delta-Treasury
+# Pestaña de Disección del Teorema de Black-Scholes
 with tab9:
-    st.title("📊 Arbitraje: Portafolio -Call + Δ·Stock vs Treasury")
+    st.title("📊 Disección del Teorema de Black-Scholes")
 
-    # Descripción del arbitraje
-    with st.expander("📚 ¿Qué es el arbitraje Call-Delta-Treasury?"):
+    # Introducción al Teorema de Black-Scholes
+    with st.expander("📚 ¿Qué es el Teorema de Black-Scholes?"):
         st.markdown("""
-        **Arbitraje Call-Delta-Treasury:**
-        - El arbitraje consiste en construir un portafolio que replique el comportamiento de una opción call usando el subyacente y el Treasury.
-        - El portafolio se compone de:
+        **Teorema de Black-Scholes:**
+        - El teorema de Black-Scholes es un modelo matemático para valorar opciones financieras.
+        - Establece que el precio de una opción puede determinarse mediante un portafolio de arbitraje que replica su comportamiento.
+        - El portafolio de arbitraje consiste en:
           - Vender una opción call (\(-C\)).
           - Comprar una cantidad \( \Delta \) del subyacente (\( \Delta \cdot S \)).
           - Invertir el resto en el Treasury (\( B \)).
@@ -1251,7 +1253,7 @@ with tab9:
           \]
         """)
 
-    # Entrada de parámetros
+    # Entrada de parámetros para el arbitraje
     st.header("⚙️ Parámetros del Arbitraje")
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -1308,7 +1310,7 @@ with tab9:
     # Calcular el valor del portafolio
     portfolio_value = -C + delta * S + B
 
-    # Mostrar resultados
+    # Mostrar resultados del arbitraje
     st.subheader("📊 Resultados del Arbitraje")
     col1, col2 = st.columns(2)
     with col1:
@@ -1346,19 +1348,96 @@ with tab9:
     )
     st.plotly_chart(fig_arbitrage, use_container_width=True)
 
-    # Explicación del resultado
-    with st.expander("📚 Explicación del Resultado"):
+    # Contribución de los Greeks
+    st.header("📊 Contribución de los Greeks al Portafolio")
+
+    # Entrada de los Greeks
+    st.subheader("⚙️ Valores de los Greeks")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        gamma = st.number_input(
+            "Gamma (\( \Gamma \)):", 
+            value=0.1, 
+            min_value=0.0, 
+            key="greeks_gamma",
+            help="Gamma de la opción."
+        )
+        theta = st.number_input(
+            "Theta (\( \Theta \)):", 
+            value=-0.05, 
+            key="greeks_theta",
+            help="Theta de la opción."
+        )
+    with col2:
+        vega = st.number_input(
+            "Vega (\( \nu \)):", 
+            value=0.2, 
+            min_value=0.0, 
+            key="greeks_vega",
+            help="Vega de la opción."
+        )
+        rho = st.number_input(
+            "Rho (\( \rho \)):", 
+            value=0.1, 
+            min_value=0.0, 
+            key="greeks_rho",
+            help="Rho de la opción."
+        )
+
+    # Calcular el impacto de los Greeks en el portafolio
+    st.subheader("📊 Impacto de los Greeks en el Portafolio")
+
+    # Cambios en los parámetros
+    delta_S = 1.0  # Cambio en el precio del subyacente
+    delta_T = 0.01  # Cambio en el tiempo
+    delta_sigma = 0.01  # Cambio en la volatilidad
+    delta_r = 0.01  # Cambio en la tasa de interés
+
+    # Impacto de cada Greek
+    impact_delta = delta * delta_S  # Impacto de Delta
+    impact_gamma = 0.5 * gamma * (delta_S ** 2)  # Impacto de Gamma
+    impact_theta = theta * delta_T  # Impacto de Theta
+    impact_vega = vega * delta_sigma  # Impacto de Vega
+    impact_rho = rho * delta_r  # Impacto de Rho
+
+    # Crear un DataFrame para mostrar los resultados
+    import pandas as pd
+    greeks_data = {
+        "Greek": ["Delta", "Gamma", "Theta", "Vega", "Rho"],
+        "Impacto": [impact_delta, impact_gamma, impact_theta, impact_vega, impact_rho]
+    }
+    df_greeks = pd.DataFrame(greeks_data)
+
+    # Mostrar la tabla de resultados
+    st.dataframe(df_greeks)
+
+    # Gráfica de barras para el impacto de los Greeks
+    st.subheader("📈 Contribución de los Greeks al Portafolio")
+    fig_greeks = go.Figure()
+    fig_greeks.add_trace(go.Bar(
+        x=df_greeks["Greek"],
+        y=df_greeks["Impacto"],
+        name="Impacto",
+        marker_color=['blue', 'green', 'red', 'purple', 'orange']
+    ))
+    fig_greeks.update_layout(
+        title="Contribución de los Greeks al Portafolio",
+        xaxis_title="Greek",
+        yaxis_title="Impacto",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_greeks, use_container_width=True)
+
+    # Explicación de la relación entre arbitraje y Greeks
+    with st.expander("📚 Relación entre Arbitraje y Greeks"):
         st.markdown("""
-        - **Valor del Portafolio:** Representa el valor actual del portafolio (\(-C + \Delta \cdot S + B\)).
-        - **Valor del Treasury:** Representa el valor futuro del Treasury (\( B \cdot e^{rT} \)).
-        - **Arbitraje Perfecto:** Si el valor del portafolio es igual al valor del Treasury, el arbitraje es perfecto.
-        - **Gráfica:** Muestra cómo el valor del Treasury y el portafolio evolucionan en el tiempo.
+        - **Arbitraje:** El portafolio de arbitraje replica el comportamiento de la opción call usando el subyacente y el Treasury.
+        - **Greeks:** Los Greeks miden cómo cambia el valor del portafolio en respuesta a cambios en el precio del subyacente, el tiempo, la volatilidad y la tasa de interés.
+        - **Integración:** Los Greeks surgen naturalmente del proceso de arbitraje, ya que describen cómo el portafolio debe ajustarse para mantener el arbitraje perfecto.
         """)
 
     # Feedback al usuario
-    st.success("¡Arbitraje calculado con éxito! Explora cómo el portafolio y el Treasury evolucionan en el tiempo.")
-
-
+    st.success("¡Disección del Teorema de Black-Scholes completada! Explora cómo el arbitraje y los Greeks interactúan para determinar el precio de la opción.")
         
 st.markdown("---")
 st.markdown("""
