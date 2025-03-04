@@ -283,7 +283,7 @@ with tab2:
     # Calcular el árbol binomial
     asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
 
-    # Función para graficar un árbol binomial con mejor diseño
+    # Función para graficar un árbol binomial (diseño original)
     def plot_binomial_tree(values, title, ax):
         G = nx.Graph()
         pos = {}
@@ -292,56 +292,42 @@ with tab2:
             for j in range(i + 1):
                 node = (i, j)
                 G.add_node(node)
-                pos[node] = (i, -j * 1.5)  # Aumentar el espacio vertical entre nodos
-                labels[node] = f"{values[i, j]:.2f}"  # Mostrar valores con 2 decimales
+                pos[node] = (i, -j + i / 2)  # Ajustar la posición vertical
+                labels[node] = f"{values[i, j]:.4f}"  # Mostrar valores con 4 decimales
                 if i > 0:
                     parent = (i - 1, j) if j < i else (i - 1, j - 1)
                     G.add_edge(parent, node)
 
         # Dibujar el árbol
-        node_size = 800  # Reducir el tamaño de los nodos
-        font_size = 8    # Reducir el tamaño de la fuente
-        node_color = "#1f78b4"  # Color de los nodos (azul)
-        edge_color = "#333333"  # Color de las conexiones (gris oscuro)
-        font_color = "white"    # Color de la fuente (blanco)
-
-        nx.draw_networkx_nodes(G, pos, node_size=node_size, node_color=node_color, ax=ax)
-        nx.draw_networkx_edges(G, pos, edge_color=edge_color, width=1.5, ax=ax)
-        nx.draw_networkx_labels(G, pos, labels, font_size=font_size, font_color=font_color, font_weight="bold", ax=ax)
-
-        # Estilo del gráfico
-        ax.set_title(title, fontsize=12, fontweight="bold", pad=20)
-        ax.set_facecolor("#f7f7f7")  # Fondo gris claro
-        ax.grid(False)  # Desactivar la cuadrícula
-        ax.axis("off")  # Ocultar ejes
+        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="red", font_size=10, font_weight="bold", ax=ax)
+        ax.set_title(title)
 
     # Mostrar los árboles binomiales uno al lado del otro
     st.subheader("📊 Árboles Binomiales")
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        fig1, ax1 = plt.subplots(figsize=(8, 6))
+        fig1, ax1 = plt.subplots(figsize=(6, 4))
         plot_binomial_tree(asset_prices, "Árbol de Precios del Activo", ax1)
         st.pyplot(fig1)
 
     with col2:
-        fig2, ax2 = plt.subplots(figsize=(8, 6))
+        fig2, ax2 = plt.subplots(figsize=(6, 4))
         plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call", ax2)
         st.pyplot(fig2)
 
     with col3:
-        fig3, ax3 = plt.subplots(figsize=(8, 6))
+        fig3, ax3 = plt.subplots(figsize=(6, 4))
         plot_binomial_tree(deltas, "Árbol de Deltas (Δ)", ax3)
         st.pyplot(fig3)
 
     with col4:
-        fig4, ax4 = plt.subplots(figsize=(8, 6))
+        fig4, ax4 = plt.subplots(figsize=(6, 4))
         plot_binomial_tree(debts, "Árbol de Deudas (B)", ax4)
         st.pyplot(fig4)
 
     # Mostrar el precio final de la opción
     st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
-
 # Página de Black-Scholes
 with tab3:
     st.title("📈 Visualizador de Letras Griegas en Black-Scholes")
