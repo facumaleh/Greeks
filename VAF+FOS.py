@@ -731,7 +731,54 @@ with tab7:
         ax.set_xlabel('Riesgo (Desviación Estándar)')
         ax.set_ylabel('Retorno Esperado')
         st.pyplot(fig)
+# Página de CAPM
+with tab8:
+    st.title("📈 Modelo de Valoración de Activos de Capital (CAPM)")
 
+    # Descripción del CAPM
+    with st.expander("📚 ¿Qué es el CAPM?"):
+        st.markdown("""
+        **CAPM:**
+        - El CAPM es un modelo que describe la relación entre el riesgo sistemático y el retorno esperado de un activo.
+        - La fórmula del CAPM es:
+          \[
+          E(R_i) = R_f + \beta_i (E(R_m) - R_f)
+          \]
+          Donde:
+          - \(E(R_i)\): Retorno esperado del activo.
+          - \(R_f\): Tasa libre de riesgo.
+          - \(\beta_i\): Beta del activo.
+          - \(E(R_m)\): Retorno esperado del mercado.
+        """)
+
+    # Entrada de parámetros
+    st.header("⚙️ Parámetros del CAPM")
+    Rf = st.number_input("Tasa libre de riesgo (Rf)", value=0.05, format="%.4f")
+    beta = st.number_input("Beta del activo (β)", value=1.2, format="%.4f")
+    Rm = st.number_input("Retorno esperado del mercado (E(Rm))", value=0.10, format="%.4f")
+
+    # Calcular el retorno esperado usando CAPM
+    expected_return = Rf + beta * (Rm - Rf)
+
+    # Mostrar el resultado
+    st.subheader("💵 Retorno Esperado del Activo")
+    st.markdown(f"**Retorno Esperado (E(Ri)):** `{expected_return:.4f}`")
+
+    # Gráfico del CAPM
+    st.subheader("📊 Gráfico del CAPM")
+    beta_range = np.linspace(0, 2, 100)
+    expected_returns = Rf + beta_range * (Rm - Rf)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=beta_range, y=expected_returns, mode='lines', name='Línea del Mercado de Valores (SML)'))
+    fig.update_layout(
+        title="CAPM - Línea del Mercado de Valores",
+        xaxis_title="Beta (β)",
+        yaxis_title="Retorno Esperado (E(Ri))",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    
 # Pie de página
 st.markdown("---")
 st.markdown("""
