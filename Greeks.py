@@ -998,8 +998,8 @@ with tab7:
         # Entrada de la función
         st.header("⚙️ Ingresa una función")
         function_input = st.text_input(
-            "Ingresa una función de \( x \) (por ejemplo, `sin(x)`, `exp(x)`, `x**2`):", 
-            "x**2", 
+            "Ingresa una función de \( x \) (por ejemplo, `ln(x)`, `sin(x)`, `exp(x)`):", 
+            "ln(x)", 
             key="taylor_explanation_function_input",
             help="Ingresa una función válida de \( x \)."
         )
@@ -1010,7 +1010,7 @@ with tab7:
         with col1:
             x0 = st.number_input(
                 "Punto de expansión \( x_0 \):", 
-                value=0.0, 
+                value=10.0, 
                 format="%.4f", 
                 key="taylor_explanation_x0_input",
                 help="Punto alrededor del cual se calculará la expansión de Taylor."
@@ -1018,7 +1018,7 @@ with tab7:
         with col2:
             x_min = st.number_input(
                 "Límite inferior de \( x \):", 
-                value=-2.0, 
+                value=5.0, 
                 format="%.4f", 
                 key="taylor_explanation_x_min_input",
                 help="Valor mínimo de \( x \) para el gráfico."
@@ -1026,7 +1026,7 @@ with tab7:
         with col3:
             x_max = st.number_input(
                 "Límite superior de \( x \):", 
-                value=2.0, 
+                value=15.0, 
                 format="%.4f", 
                 key="taylor_explanation_x_max_input",
                 help="Valor máximo de \( x \) para el gráfico."
@@ -1069,6 +1069,8 @@ with tab7:
             # Graficar la función original y las aproximaciones de Taylor
             st.subheader("📊 Gráficas")
             fig = go.Figure()
+    
+            # Función original
             fig.add_trace(go.Scatter(
                 x=x_vals, 
                 y=y_vals, 
@@ -1076,6 +1078,8 @@ with tab7:
                 name=f"Función: {function_input}", 
                 line=dict(color='blue', width=2)
             ))
+    
+            # Taylor de primer grado
             fig.add_trace(go.Scatter(
                 x=x_vals, 
                 y=y_taylor_1, 
@@ -1083,6 +1087,8 @@ with tab7:
                 name="Taylor Grado 1", 
                 line=dict(color='green', dash='dash', width=2)
             ))
+    
+            # Taylor de segundo grado
             fig.add_trace(go.Scatter(
                 x=x_vals, 
                 y=y_taylor_2, 
@@ -1090,12 +1096,36 @@ with tab7:
                 name="Taylor Grado 2", 
                 line=dict(color='red', dash='dash', width=2)
             ))
+    
+            # Línea vertical en el punto de expansión
             fig.add_vline(
                 x=x0, 
                 line=dict(color='gray', dash='dot'), 
                 annotation_text=f"x₀ = {x0}", 
                 annotation_position="top right"
             )
+    
+            # Resaltar áreas de subestimación y sobreestimación
+            fig.add_trace(go.Scatter(
+                x=x_vals, 
+                y=np.minimum(y_vals, y_taylor_1),  # Área donde Taylor 1 subestima
+                fill='tonexty',
+                mode='none',
+                name='Taylor 1 Subestima',
+                fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
+                showlegend=False
+            ))
+    
+            fig.add_trace(go.Scatter(
+                x=x_vals, 
+                y=np.maximum(y_vals, y_taylor_1),  # Área donde Taylor 1 sobreestima
+                fill='tonexty',
+                mode='none',
+                name='Taylor 1 Sobrestima',
+                fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
+                showlegend=False
+            ))
+    
             fig.update_layout(
                 title="Aproximación de Taylor",
                 xaxis_title="x",
