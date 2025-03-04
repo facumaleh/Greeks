@@ -998,11 +998,14 @@ with tab8:
     # Entrada de la función
     st.header("⚙️ Ingresa una función")
     function_input = st.text_input(
-        "Ingresa una función de \( x \) (por ejemplo, `ln(x)`, `sin(x)`, `exp(x)`):", 
-        "ln(x)", 
+        "Ingresa una función de \( x \) (por ejemplo, `x**2`, `sin(x)`, `exp(x)`):", 
+        "x**2", 
         key="taylor_explanation_function_input",
-        help="Ingresa una función válida de \( x \)."
+        help="Ingresa una función válida de \( x \). Usa '**' para exponenciación (por ejemplo, 'x**2')."
     )
+
+    # Reemplazar '^' por '**' en la función ingresada
+    function_input = function_input.replace("^", "**")
 
     # Configuración del gráfico en columnas
     st.header("⚙️ Configuración del gráfico")
@@ -1221,7 +1224,6 @@ with tab8:
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
-
 
 st.markdown("---")
 st.markdown("""
