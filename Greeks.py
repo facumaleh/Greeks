@@ -1121,7 +1121,6 @@ with tab7:
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
 
-
 # Pie de página
 st.markdown("---")
 st.markdown("""
