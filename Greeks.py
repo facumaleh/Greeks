@@ -42,7 +42,7 @@ st.markdown("""
 st.title("Enjoy Finance 📊")
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9  = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8  = st.tabs([
     "1️⃣ Aproximación de Taylor", 
     "2️⃣ Árbol Binomial", 
     "3️⃣ Black-Scholes", 
@@ -50,8 +50,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9  = st.tabs([
     "5️⃣ Optimización con Lagrange",
     "6️⃣ Paridad Put-Call",
     "7️⃣ Simulación de Monte Carlo para Opciones",
-    "8️⃣ Explicación Gráfica de Taylor",
-    "9️⃣ Arbitraje Call-Delta-Treasury"
+    "8️⃣ Explicación Gráfica de Taylor"
 ])
 
 # Página de Aproximación de Taylor
@@ -1231,179 +1230,6 @@ with tab8:
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
 
-# Pestaña de Explicación del Teorema de Black-Scholes
-# Pestaña de Explicación del Teorema de Black-Scholes
-with tab9:
-        st.title("📊 Explicación del Teorema de Black-Scholes")
-
-    # Introducción al Teorema de Black-Scholes
-    st.header("📚 ¿Qué es el Teorema de Black-Scholes?")
-    st.markdown("""
-    El **Teorema de Black-Scholes** es una fórmula matemática que nos ayuda a calcular el precio de una **opción financiera**.
-    - Una **opción** es un contrato que te da el derecho (pero no la obligación) de comprar o vender un activo (como una acción) a un precio específico en el futuro.
-    - El teorema nos dice cómo el precio de la opción depende de:
-      - El precio actual del activo (\( S \)).
-      - El precio al que puedes comprar/vender (\( K \)).
-      - El tiempo hasta que la opción expire (\( T \)).
-      - La volatilidad del activo (\( \sigma \)).
-      - La tasa de interés libre de riesgo (\( r \)).
-    """)
-
-    # Ejemplo numérico
-    st.header("📝 Ejemplo Numérico")
-    st.markdown("""
-    Vamos a calcular el precio de una **opción call** usando el Teorema de Black-Scholes.
-    - **Precio del activo (\( S \)):** 100
-    - **Precio de ejercicio (\( K \)):** 100
-    - **Tiempo hasta vencimiento (\( T \)):** 1 año
-    - **Tasa libre de riesgo (\( r \)):** 5%
-    - **Volatilidad (\( \sigma \)):** 20%
-    """)
-
-    # Entrada de parámetros
-    st.header("⚙️ Ajusta los Parámetros")
-    col1, col2 = st.columns(2)
-    with col1:
-        S = st.number_input(
-            "Precio del Activo (\( S \)):", 
-            value=100.0, 
-            min_value=0.01, 
-            key="bs_S",
-            help="Precio actual del activo subyacente."
-        )
-        K = st.number_input(
-            "Precio de Ejercicio (\( K \)):", 
-            value=100.0, 
-            min_value=0.01, 
-            key="bs_K",
-            help="Precio al que se puede ejercer la opción."
-        )
-    with col2:
-        T = st.number_input(
-            "Tiempo hasta Vencimiento (\( T \)):", 
-            value=1.0, 
-            min_value=0.01, 
-            key="bs_T",
-            help="Tiempo restante hasta el vencimiento de la opción."
-        )
-        r = st.number_input(
-            "Tasa Libre de Riesgo (\( r \)):", 
-            value=0.05, 
-            min_value=0.0, 
-            key="bs_r",
-            help="Tasa de interés libre de riesgo."
-        )
-        sigma = st.number_input(
-            "Volatilidad (\( \sigma \)):", 
-            value=0.2, 
-            min_value=0.01, 
-            key="bs_sigma",
-            help="Volatilidad del activo subyacente."
-        )
-
-    # Calcular el precio de la opción call usando Black-Scholes
-    def black_scholes_call(S, K, T, r, sigma):
-        d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-        d2 = d1 - sigma * np.sqrt(T)
-        call_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
-        return call_price
-
-    call_price = black_scholes_call(S, K, T, r, sigma)
-
-    # Mostrar el precio de la opción call
-    st.subheader("📊 Precio de la Opción Call")
-    st.markdown(f"El precio de la opción call es: **{call_price:.2f}**")
-
-    # Explicación del arbitraje
-    st.header("📚 ¿Qué es el Arbitraje?")
-    st.markdown("""
-    El **arbitraje** es una estrategia que nos permite replicar el comportamiento de una opción usando el activo subyacente y el Treasury.
-    - **Portafolio de Arbitraje:**
-      - Vender una opción call (\(-C\)).
-      - Comprar una cantidad \( \Delta \) del activo (\( \Delta \cdot S \)).
-      - Invertir el resto en el Treasury (\( B \)).
-    - El valor del portafolio debe ser igual al valor del Treasury en todo momento.
-    """)
-
-    # Calcular Delta y el valor del Treasury
-    d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
-    delta = norm.cdf(d1)  # Delta de la opción call
-    B = call_price - delta * S  # Inversión en el Treasury
-
-    # Mostrar Delta y el valor del Treasury
-    st.subheader("📊 Delta y Treasury")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Delta (\( \Delta \))", f"{delta:.4f}")
-    with col2:
-        st.metric("Inversión en el Treasury (\( B \))", f"{B:.2f}")
-
-    # Gráfica del arbitraje
-    st.subheader("📈 Evolución del Arbitraje")
-    time_values = np.linspace(0, T, 100)  # Rango de tiempo
-    treasury_values = B * np.exp(r * time_values)  # Valor del Treasury en el tiempo
-    portfolio_values = -call_price + delta * S + B * np.exp(r * time_values)  # Valor del portafolio en el tiempo
-
-    fig_arbitrage = go.Figure()
-    fig_arbitrage.add_trace(go.Scatter(
-        x=time_values, 
-        y=treasury_values, 
-        mode='lines', 
-        name="Treasury", 
-        line=dict(color='blue', width=2)
-    ))
-    fig_arbitrage.add_trace(go.Scatter(
-        x=time_values, 
-        y=portfolio_values, 
-        mode='lines', 
-        name="Portafolio (-Call + Δ·Stock + B)", 
-        line=dict(color='green', dash='dash', width=2)
-    ))
-    fig_arbitrage.update_layout(
-        title="Evolución del Arbitraje",
-        xaxis_title="Tiempo",
-        yaxis_title="Valor",
-        template="plotly_white",
-        legend=dict(x=0.02, y=0.98)
-    )
-    st.plotly_chart(fig_arbitrage, use_container_width=True)
-
-    # Explicación de los Greeks
-    st.header("📚 ¿Qué son los Greeks?")
-    st.markdown("""
-    Los **Greeks** son medidas que nos dicen cómo cambia el precio de la opción cuando cambian ciertos factores:
-    - **Delta (\( \Delta \)):** Cambio en el precio de la opción cuando el precio del activo subyacente cambia.
-    - **Gamma (\( \Gamma \)):** Cambio en Delta cuando el precio del activo subyacente cambia.
-    - **Theta (\( \Theta \)):** Cambio en el precio de la opción con el paso del tiempo.
-    - **Vega (\( \nu \)):** Cambio en el precio de la opción cuando la volatilidad cambia.
-    - **Rho (\( \rho \)):** Cambio en el precio de la opción cuando la tasa de interés cambia.
-    """)
-
-    # Gráfica de los Greeks
-    st.subheader("📊 Impacto de los Greeks")
-    greeks_data = {
-        "Greek": ["Delta", "Gamma", "Theta", "Vega", "Rho"],
-        "Valor": [delta, 0.1, -0.05, 0.2, 0.1]  # Valores de ejemplo
-    }
-    df_greeks = pd.DataFrame(greeks_data)  # Usar pandas para crear el DataFrame
-
-    fig_greeks = go.Figure()
-    fig_greeks.add_trace(go.Bar(
-        x=df_greeks["Greek"],
-        y=df_greeks["Valor"],
-        name="Valor",
-        marker_color=['blue', 'green', 'red', 'purple', 'orange']
-    ))
-    fig_greeks.update_layout(
-        title="Impacto de los Greeks",
-        xaxis_title="Greek",
-        yaxis_title="Valor",
-        template="plotly_white"
-    )
-    st.plotly_chart(fig_greeks, use_container_width=True)
-
-    # Feedback al usuario
-    st.success("¡Explicación completada! Ahora entiendes cómo funciona el Teorema de Black-Scholes.")
 
 st.markdown("---")
 st.markdown("""
