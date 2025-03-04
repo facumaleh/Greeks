@@ -42,16 +42,15 @@ st.markdown("""
 st.title("Enjoy Finance")
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "1️⃣ Aproximación de Taylor", 
     "2️⃣ Árbol Binomial", 
     "3️⃣ Black-Scholes", 
     "4️⃣ Expansión de Taylor para Call",
     "5️⃣ Optimización con Lagrange",
     "6️⃣ Paridad Put-Call",
-    "7️⃣ Markowitz",
-    "8️⃣ CAPM",
-    "9️⃣ Montecarlo"
+    "7️⃣ CAPM",
+    "8️⃣ Montecarlo"
 ])
 
 # Página de Aproximación de Taylor
@@ -680,84 +679,8 @@ with tab6:
     - **Tiempo hasta Vencimiento (T):** Tiempo restante hasta el vencimiento de la opción.
     - **Precio de la Opción Put (P):** Precio calculado de la opción put usando la fórmula de paridad put-call.
     """)
-    # Página de Markowitz y Teoría de Portafolios (Mejorada)
+    # Página de CAPM (Mejorada)
 with tab7:
-    st.title("📊 Modelo de Markowitz y Teoría de Portafolios")
-
-    # Descripción del modelo de Markowitz
-    with st.expander("📚 ¿Qué es el Modelo de Markowitz?"):
-        st.markdown("""
-        **Modelo de Markowitz:**
-        - El modelo de Markowitz permite construir portafolios óptimos que maximizan el retorno para un nivel dado de riesgo.
-        - Utiliza la diversificación para reducir el riesgo no sistemático.
-        - La frontera eficiente muestra los portafolios con el mejor retorno esperado para cada nivel de riesgo.
-        """)
-
-    # Entrada de datos históricos de precios
-    st.header("⚙️ Ingresa los Datos Históricos de Precios")
-    uploaded_file = st.file_uploader("Sube un archivo CSV con precios históricos de activos", type=["csv"])
-    
-    if uploaded_file is not None:
-        data = pd.read_csv(uploaded_file, index_col=0, parse_dates=True)
-        st.write("Datos cargados:")
-        st.write(data.head())
-
-        # Selección de activos
-        st.header("📊 Selección de Activos")
-        selected_assets = st.multiselect("Selecciona los activos para el portafolio", data.columns.tolist(), default=data.columns.tolist())
-
-        if len(selected_assets) >= 2:
-            # Calcular retornos y matriz de covarianza
-            returns = data[selected_assets].pct_change().dropna()
-            cov_matrix = returns.cov()
-            expected_returns = returns.mean()
-
-            # Optimización de portafolios
-            st.header("📈 Optimización de Portafolios")
-            num_portfolios = st.number_input("Número de portafolios a simular", value=5000, min_value=1000)
-            risk_free_rate = st.number_input("Tasa libre de riesgo", value=0.05, format="%.4f")
-
-            results = np.zeros((3, num_portfolios))
-            weights_record = []
-            for i in range(num_portfolios):
-                weights = np.random.random(len(selected_assets))
-                weights /= np.sum(weights)
-                portfolio_return = np.sum(weights * expected_returns) * 252
-                portfolio_stddev = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(252)
-                results[0, i] = portfolio_return
-                results[1, i] = portfolio_stddev
-                results[2, i] = (portfolio_return - risk_free_rate) / portfolio_stddev  # Sharpe Ratio
-                weights_record.append(weights)
-
-            # Encontrar el portafolio óptimo (máximo Sharpe Ratio)
-            max_sharpe_idx = np.argmax(results[2])
-            optimal_weights = weights_record[max_sharpe_idx]
-            optimal_return = results[0, max_sharpe_idx]
-            optimal_risk = results[1, max_sharpe_idx]
-
-            # Gráfico de la frontera eficiente
-            st.subheader("📊 Frontera Eficiente y Portafolio Óptimo")
-            fig, ax = plt.subplots()
-            ax.scatter(results[1, :], results[0, :], c=results[2, :], cmap='viridis', marker='o', alpha=0.5)
-            ax.scatter(optimal_risk, optimal_return, c='red', marker='*', s=200, label='Portafolio Óptimo')
-            ax.set_title('Frontera Eficiente')
-            ax.set_xlabel('Riesgo (Desviación Estándar)')
-            ax.set_ylabel('Retorno Esperado')
-            ax.legend()
-            st.pyplot(fig)
-
-            # Mostrar el portafolio óptimo
-            st.subheader("💵 Portafolio Óptimo")
-            st.markdown(f"**Retorno Esperado:** `{optimal_return:.4f}`")
-            st.markdown(f"**Riesgo (Desviación Estándar):** `{optimal_risk:.4f}`")
-            st.markdown(f"**Ratio de Sharpe:** `{results[2, max_sharpe_idx]:.4f}`")
-            st.write("**Pesos del Portafolio Óptimo:**")
-            for asset, weight in zip(selected_assets, optimal_weights):
-                st.write(f"- **{asset}:** `{weight:.4f}`")
-        else:
-            st.error("Selecciona al menos 2 activos para construir un portafolio.")
-# Página de CAPM
-with tab8:
     st.title("📈 Modelo de Valoración de Activos de Capital (CAPM)")
 
     # Descripción del CAPM
@@ -789,13 +712,23 @@ with tab8:
     st.subheader("💵 Retorno Esperado del Activo")
     st.markdown(f"**Retorno Esperado (E(Ri)):** `{expected_return:.4f}`")
 
+    # Interpretación de la beta
+    st.subheader("📊 Interpretación de la Beta (β)")
+    if beta < 1:
+        st.markdown("**El activo es menos volátil que el mercado.**")
+    elif beta == 1:
+        st.markdown("**El activo tiene la misma volatilidad que el mercado.**")
+    else:
+        st.markdown("**El activo es más volátil que el mercado.**")
+
     # Gráfico del CAPM
-    st.subheader("📊 Gráfico del CAPM")
+    st.subheader("📈 Línea del Mercado de Valores (SML)")
     beta_range = np.linspace(0, 2, 100)
     expected_returns = Rf + beta_range * (Rm - Rf)
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=beta_range, y=expected_returns, mode='lines', name='Línea del Mercado de Valores (SML)'))
+    fig.add_trace(go.Scatter(x=beta_range, y=expected_returns, mode='lines', name='SML'))
+    fig.add_trace(go.Scatter(x=[beta], y=[expected_return], mode='markers', name='Activo', marker=dict(color='red', size=10)))
     fig.update_layout(
         title="CAPM - Línea del Mercado de Valores",
         xaxis_title="Beta (β)",
@@ -803,8 +736,8 @@ with tab8:
         template="plotly_white"
     )
     st.plotly_chart(fig, use_container_width=True)
-    # Página de Simulación de Montecarlo
-with tab9:
+# Página de Simulación de Montecarlo (Mejorada)
+with tab8:
     st.title("🎲 Simulación de Montecarlo para Valuación de Opciones")
 
     # Descripción de la simulación de Montecarlo
@@ -822,10 +755,11 @@ with tab9:
     T = st.number_input("Tiempo hasta vencimiento (T)", value=1.0, format="%.4f")
     r = st.number_input("Tasa libre de riesgo (r)", value=0.05, format="%.4f")
     sigma = st.number_input("Volatilidad (σ)", value=0.2, format="%.4f")
-    num_simulations = st.number_input("Número de simulaciones", value=1000, min_value=100)
+    num_simulations = st.number_input("Número de simulaciones", value=10000, min_value=1000)
+    option_type = st.selectbox("Tipo de opción", ["Europea", "Americana"])
 
     # Simulación de Montecarlo
-    def monte_carlo_option_price(S0, K, T, r, sigma, num_simulations):
+    def monte_carlo_option_price(S0, K, T, r, sigma, num_simulations, option_type):
         np.random.seed(42)
         dt = T / 252
         paths = np.zeros((252, num_simulations))
@@ -833,15 +767,20 @@ with tab9:
         for t in range(1, 252):
             z = np.random.standard_normal(num_simulations)
             paths[t] = paths[t - 1] * np.exp((r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * z)
-        option_prices = np.maximum(paths[-1] - K, 0)
+        
+        if option_type == "Europea":
+            option_prices = np.maximum(paths[-1] - K, 0)
+        else:  # Americana
+            option_prices = np.maximum(np.max(paths, axis=0) - K, 0)
+        
         option_price = np.exp(-r * T) * np.mean(option_prices)
-        return paths, option_price
+        return paths, option_price, option_prices
 
-    paths, option_price = monte_carlo_option_price(S0, K, T, r, sigma, num_simulations)
+    paths, option_price, final_prices = monte_carlo_option_price(S0, K, T, r, sigma, num_simulations, option_type)
 
     # Mostrar el resultado
-    st.subheader("💵 Precio de la Opción Call")
-    st.markdown(f"**Precio estimado de la opción:** `{option_price:.4f}`")
+    st.subheader("💵 Precio de la Opción")
+    st.markdown(f"**Precio estimado de la opción {option_type}:** `{option_price:.4f}`")
 
     # Gráfico de los caminos simulados
     st.subheader("📊 Caminos Simulados del Precio del Activo")
@@ -852,6 +791,18 @@ with tab9:
         title="Simulación de Montecarlo - Caminos del Precio del Activo",
         xaxis_title="Tiempo",
         yaxis_title="Precio del Activo",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Histograma de precios finales
+    st.subheader("📊 Distribución de Precios Finales")
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(x=final_prices, nbinsx=50, marker_color='blue', opacity=0.75))
+    fig.update_layout(
+        title="Distribución de Precios Finales del Activo",
+        xaxis_title="Precio Final",
+        yaxis_title="Frecuencia",
         template="plotly_white"
     )
     st.plotly_chart(fig, use_container_width=True)
