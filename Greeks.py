@@ -999,7 +999,7 @@ with tab8:
     st.header("⚙️ Ingresa una función")
     function_input = st.text_input(
         "Ingresa una función de \( x \) (por ejemplo, `x**2`, `sin(x)`, `exp(x)`):", 
-        "x**2", 
+        "ln(x)", 
         key="taylor_explanation_function_input",
         help="Ingresa una función válida de \( x \). Usa '**' para exponenciación (por ejemplo, 'x**2')."
     )
