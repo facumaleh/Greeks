@@ -1234,12 +1234,12 @@ with tab8:
 # Pestaña de Explicación del Teorema de Black-Scholes
 # Pestaña de Explicación del Teorema de Black-Scholes
 with tab9:
-    st.title("📊 Explicación del Teorema de Black-Scholes")
+        st.title("📊 Explicación del Teorema de Black-Scholes")
 
     # Introducción al Teorema de Black-Scholes
     st.header("📚 ¿Qué es el Teorema de Black-Scholes?")
     st.markdown("""
-    El **Teorema de Black-Scholes** es una fórmula matemática que nos ayuda a calcular el precio de una opción financiera.
+    El **Teorema de Black-Scholes** es una fórmula matemática que nos ayuda a calcular el precio de una **opción financiera**.
     - Una **opción** es un contrato que te da el derecho (pero no la obligación) de comprar o vender un activo (como una acción) a un precio específico en el futuro.
     - El teorema nos dice cómo el precio de la opción depende de:
       - El precio actual del activo (\( S \)).
@@ -1400,6 +1400,10 @@ with tab9:
         yaxis_title="Valor",
         template="plotly_white"
     )
+    st.plotly_chart(fig_greeks, use_container_width=True)
+
+    # Feedback al usuario
+    st.success("¡Explicación completada! Ahora entiendes cómo funciona el Teorema de Black-Scholes.")
 
 st.markdown("---")
 st.markdown("""
