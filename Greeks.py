@@ -992,7 +992,7 @@ with tab8:
     st.title("📊 Explicación Gráfica de la Aproximación de Taylor")
     st.markdown("""
     Esta herramienta te permite visualizar cómo el polinomio de Taylor de primer y segundo grado aproxima una función alrededor de un punto \( x_0 \).
-    Explora cómo la aproximación subestima o sobreestima la función dependiendo de la concavidad y el valor de \( \Delta x \).
+    Explora cómo la aproximación subestima o sobreestima la función dependiendo de la concavidad y el valor de Dx.
     """)
 
     # Entrada de la función
