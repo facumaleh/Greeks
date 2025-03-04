@@ -6,7 +6,7 @@ from scipy.stats import norm
 import sympy as sp
 import plotly.graph_objects as go
 
-# Configuración de la página 
+# Configuración de la página
 st.set_page_config(
     layout="wide",
     page_title="Enjoy Finance",
@@ -39,7 +39,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # Título de la aplicación
-st.title("Enjoy Finance")
+st.title("Enjoy Finance 📊")
 
 # Menú de navegación con pestañas
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
@@ -60,22 +60,45 @@ with tab1:
         st.markdown("""
         **Expansión de Taylor:**
         - La expansión de Taylor permite aproximar una función alrededor de un punto \( x_0 \).
-        - Aca podes calcular las expansiones de Taylor de grado 1 y grado 2 para cualquier función.
+        - Aquí puedes calcular las expansiones de Taylor de grado 1 y grado 2 para cualquier función.
         """)
 
     # Entrada de la función
     st.header("⚙️ Ingresa una función")
-    function_input = st.text_input("Ingresa una función de x (por ejemplo, sin(x), exp(x), x**2):", "x*x", key="taylor_function_input")
+    function_input = st.text_input(
+        "Ingresa una función de x (por ejemplo, sin(x), exp(x), x**2):", 
+        "x*x", 
+        key="taylor_function_input",
+        help="Ingresa una función válida de x."
+    )
 
     # Configuración del gráfico
     st.header("⚙️ Configuración del gráfico")
     col1, col2, col3 = st.columns(3)
     with col1:
-        x0 = st.number_input("Punto de expansión (x0)", value=0.01, format="%.4f", key="taylor_x0_input")
+        x0 = st.number_input(
+            "Punto de expansión (x0)", 
+            value=0.01, 
+            format="%.4f", 
+            key="taylor_x0_input",
+            help="Punto alrededor del cual se calculará la expansión de Taylor."
+        )
     with col2:
-        x_min = st.number_input("Límite inferior de x", value=-5.0, format="%.4f", key="taylor_x_min_input")
+        x_min = st.number_input(
+            "Límite inferior de x", 
+            value=-5.0, 
+            format="%.4f", 
+            key="taylor_x_min_input",
+            help="Valor mínimo de x para el gráfico."
+        )
     with col3:
-        x_max = st.number_input("Límite superior de x", value=5.0, format="%.4f", key="taylor_x_max_input")
+        x_max = st.number_input(
+            "Límite superior de x", 
+            value=5.0, 
+            format="%.4f", 
+            key="taylor_x_max_input",
+            help="Valor máximo de x para el gráfico."
+        )
 
     # Definir la variable simbólica
     x = sp.symbols('x')
@@ -120,16 +143,44 @@ with tab1:
         # Graficar la función original y las aproximaciones de Taylor
         st.subheader("📊 Gráficas")
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='lines', name=f"Función: {function_input}", line=dict(color='blue')))
-        fig.add_trace(go.Scatter(x=x_vals, y=y_taylor_1, mode='lines', name="Taylor Grado 1", line=dict(color='green', dash='dash')))
-        fig.add_trace(go.Scatter(x=x_vals, y=y_taylor_2, mode='lines', name="Taylor Grado 2", line=dict(color='red', dash='dash')))
-        fig.add_vline(x=x0, line=dict(color='gray', dash='dot'), annotation_text=f"x0 = {x0}", annotation_position="top right")
-        fig.update_layout(title="Aproximación de Taylor", xaxis_title="x", yaxis_title="f(x)", template="plotly_white")
+        fig.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_vals, 
+            mode='lines', 
+            name=f"Función: {function_input}", 
+            line=dict(color='blue', width=2)
+        ))
+        fig.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_taylor_1, 
+            mode='lines', 
+            name="Taylor Grado 1", 
+            line=dict(color='green', dash='dash', width=2)
+        ))
+        fig.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_taylor_2, 
+            mode='lines', 
+            name="Taylor Grado 2", 
+            line=dict(color='red', dash='dash', width=2)
+        ))
+        fig.add_vline(
+            x=x0, 
+            line=dict(color='gray', dash='dot'), 
+            annotation_text=f"x0 = {x0}", 
+            annotation_position="top right"
+        )
+        fig.update_layout(
+            title="Aproximación de Taylor",
+            xaxis_title="x",
+            yaxis_title="f(x)",
+            template="plotly_white",
+            legend=dict(x=0.02, y=0.98)
+        )
         st.plotly_chart(fig, use_container_width=True)
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
-
 
 # Página de Árbol Binomial
 with tab2:
@@ -147,13 +198,54 @@ with tab2:
     st.header("⚙️ Parámetros del Modelo")
     col1, col2 = st.columns(2)
     with col1:
-        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01, format="%.4f", key="binomial_S")
-        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01, format="%.4f", key="binomial_K")
-        U = st.number_input("Factor de Subida (U)", value=1.1, min_value=1.0, format="%.4f", key="binomial_U")
+        S = st.number_input(
+            "Precio del Activo (S)", 
+            value=100.0, 
+            min_value=0.01, 
+            format="%.4f", 
+            key="binomial_S",
+            help="Precio actual del activo subyacente."
+        )
+        K = st.number_input(
+            "Precio de Ejercicio (K)", 
+            value=100.0, 
+            min_value=0.01, 
+            format="%.4f", 
+            key="binomial_K",
+            help="Precio al que se puede ejercer la opción."
+        )
+        U = st.number_input(
+            "Factor de Subida (U)", 
+            value=1.1, 
+            min_value=1.0, 
+            format="%.4f", 
+            key="binomial_U",
+            help="Factor de subida del precio del activo."
+        )
     with col2:
-        D = st.number_input("Factor de Bajada (D)", value=0.9, max_value=1.0, format="%.4f", key="binomial_D")
-        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.05, min_value=1.0, format="%.4f", key="binomial_R")
-        periods = st.number_input("Número de Periodos", value=3, min_value=1, key="binomial_periods")
+        D = st.number_input(
+            "Factor de Bajada (D)", 
+            value=0.9, 
+            max_value=1.0, 
+            format="%.4f", 
+            key="binomial_D",
+            help="Factor de bajada del precio del activo."
+        )
+        R = st.number_input(
+            "Factor de Capitalización (R = 1 + Rf)", 
+            value=1.05, 
+            min_value=1.0, 
+            format="%.4f", 
+            key="binomial_R",
+            help="Factor de capitalización libre de riesgo."
+        )
+        periods = st.number_input(
+            "Número de Periodos", 
+            value=3, 
+            min_value=1, 
+            key="binomial_periods",
+            help="Número de periodos en el árbol binomial."
+        )
 
     # Función para calcular el precio de la opción call usando árbol binomial
     def binomial_tree_call(S, K, U, D, R, periods):
@@ -191,65 +283,51 @@ with tab2:
     # Calcular el árbol binomial
     asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
 
-# Función para graficar un árbol binomial con mejor diseño
-def plot_binomial_tree(values, title, ax):
-    G = nx.Graph()
-    pos = {}
-    labels = {}
-    
-    # Crear nodos y conexiones
-    for i in range(values.shape[0]):
-        for j in range(i + 1):
-            node = (i, j)
-            G.add_node(node)
-            pos[node] = (i, -j + i / 2)  # Ajustar la posición vertical
-            labels[node] = f"{values[i, j]:.4f}"  # Mostrar valores con 4 decimales
-            if i > 0:
-                parent = (i - 1, j) if j < i else (i - 1, j - 1)
-                G.add_edge(parent, node)
+    # Función para graficar un árbol binomial (diseño original)
+    def plot_binomial_tree(values, title, ax):
+        G = nx.Graph()
+        pos = {}
+        labels = {}
+        for i in range(values.shape[0]):
+            for j in range(i + 1):
+                node = (i, j)
+                G.add_node(node)
+                pos[node] = (i, -j + i / 2)  # Ajustar la posición vertical
+                labels[node] = f"{values[i, j]:.4f}"  # Mostrar valores con 4 decimales
+                if i > 0:
+                    parent = (i - 1, j) if j < i else (i - 1, j - 1)
+                    G.add_edge(parent, node)
 
-    # Dibujar el árbol
-    node_size = 2000  # Tamaño de los nodos
-    font_size = 10    # Tamaño de la fuente
-    node_color = "#1f78b4"  # Color de los nodos (azul)
-    edge_color = "#333333"  # Color de las conexiones (gris oscuro)
-    font_color = "white"    # Color de la fuente (blanco)
+        # Dibujar el árbol
+        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="red", font_size=10, font_weight="bold", ax=ax)
+        ax.set_title(title)
 
-    nx.draw_networkx_nodes(G, pos, node_size=node_size, node_color=node_color, ax=ax)
-    nx.draw_networkx_edges(G, pos, edge_color=edge_color, width=2, ax=ax)
-    nx.draw_networkx_labels(G, pos, labels, font_size=font_size, font_color=font_color, font_weight="bold", ax=ax)
+    # Mostrar los árboles binomiales uno al lado del otro
+    st.subheader("📊 Árboles Binomiales")
+    col1, col2, col3, col4 = st.columns(4)
 
-    # Estilo del gráfico
-    ax.set_title(title, fontsize=14, fontweight="bold", pad=20)
-    ax.set_facecolor("#f7f7f7")  # Fondo gris claro
-    ax.grid(False)  # Desactivar la cuadrícula
-    ax.axis("off")  # Ocultar ejes
+    with col1:
+        fig1, ax1 = plt.subplots(figsize=(6, 4))
+        plot_binomial_tree(asset_prices, "Árbol de Precios del Activo", ax1)
+        st.pyplot(fig1)
 
-# Mostrar los árboles binomiales uno al lado del otro
-st.subheader("📊 Árboles Binomiales")
-col1, col2, col3, col4 = st.columns(4)
+    with col2:
+        fig2, ax2 = plt.subplots(figsize=(6, 4))
+        plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call", ax2)
+        st.pyplot(fig2)
 
-with col1:
-    fig1, ax1 = plt.subplots(figsize=(6, 4))
-    plot_binomial_tree(asset_prices, "Árbol de Precios del Activo", ax1)
-    st.pyplot(fig1)
+    with col3:
+        fig3, ax3 = plt.subplots(figsize=(6, 4))
+        plot_binomial_tree(deltas, "Árbol de Deltas (Δ)", ax3)
+        st.pyplot(fig3)
 
-with col2:
-    fig2, ax2 = plt.subplots(figsize=(6, 4))
-    plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call", ax2)
-    st.pyplot(fig2)
+    with col4:
+        fig4, ax4 = plt.subplots(figsize=(6, 4))
+        plot_binomial_tree(debts, "Árbol de Deudas (B)", ax4)
+        st.pyplot(fig4)
 
-with col3:
-    fig3, ax3 = plt.subplots(figsize=(6, 4))
-    plot_binomial_tree(deltas, "Árbol de Deltas (Δ)", ax3)
-    st.pyplot(fig3)
-
-with col4:
-    fig4, ax4 = plt.subplots(figsize=(6, 4))
-    plot_binomial_tree(debts, "Árbol de Deudas (B)", ax4)
-    st.pyplot(fig4)
+    # Mostrar el precio final de la opción
     st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
-    
 # Página de Black-Scholes
 with tab3:
     st.title("📈 Visualizador de Letras Griegas en Black-Scholes")
@@ -269,17 +347,42 @@ with tab3:
     st.header("⚙️ Parámetros de la Opción")
     col1, col2, col3 = st.columns(3)
     with col1:
-        S = st.slider("Precio del Activo (S)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="black_scholes_S")
+        S = st.slider(
+            "Precio del Activo (S)", 
+            1.0, 200.0, 100.0, 
+            help="Precio actual del activo subyacente.", 
+            key="black_scholes_S"
+        )
     with col2:
-        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="black_scholes_K")
+        K = st.slider(
+            "Precio de Ejercicio (K)", 
+            1.0, 200.0, 100.0, 
+            help="Precio al que se puede ejercer la opción.", 
+            key="black_scholes_K"
+        )
     with col3:
-        T = st.slider("Tiempo hasta vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="black_scholes_T")
+        T = st.slider(
+            "Tiempo hasta vencimiento (T)", 
+            0.1, 5.0, 1.0, 
+            help="Tiempo restante hasta el vencimiento de la opción.", 
+            key="black_scholes_T"
+        )
 
     col4, col5 = st.columns(2)
     with col4:
-        r = st.slider("Tasa libre de riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="black_scholes_r")
+        r = st.slider(
+            "Tasa libre de riesgo (r)", 
+            0.0, 0.2, 0.05, 
+            help="Tasa de interés libre de riesgo.", 
+            key="black_scholes_r"
+        )
     with col5:
-        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="black_scholes_sigma")
+        sigma = st.slider(
+            "Volatilidad (σ)", 
+            0.1, 1.0, 0.2, 
+            help="Volatilidad del activo subyacente.", 
+            key="black_scholes_sigma"
+        )
 
     # Fórmula de Black-Scholes para una opción call
     def black_scholes_call(S, K, T, r, sigma):
@@ -390,24 +493,49 @@ with tab4:
         **Expansión de Taylor para una Opción Call:**
         - La expansión de Taylor permite aproximar el precio de una opción call alrededor de un precio del activo subyacente \( S_0 \).
         - Se utiliza para estimar cómo cambia el precio de la opción cuando el precio del activo subyacente varía ligeramente.
-        - Aca se calcula la expansión de Taylor de primer y segundo orden.
+        - Aquí se calcula la expansión de Taylor de primer y segundo orden.
         """)
 
     # Controles para los parámetros de la opción (siempre visibles)
     st.header("⚙️ Parámetros de la Opción")
     col1, col2, col3 = st.columns(3)
     with col1:
-        S0 = st.slider("Precio Actual del Activo (S₀)", 1.0, 200.0, 100.0, help="Precio actual del activo subyacente.", key="taylor_S0")
+        S0 = st.slider(
+            "Precio Actual del Activo (S₀)", 
+            1.0, 200.0, 100.0, 
+            help="Precio actual del activo subyacente.", 
+            key="taylor_S0"
+        )
     with col2:
-        K = st.slider("Precio de Ejercicio (K)", 1.0, 200.0, 100.0, help="Precio al que se puede ejercer la opción.", key="taylor_K")
+        K = st.slider(
+            "Precio de Ejercicio (K)", 
+            1.0, 200.0, 100.0, 
+            help="Precio al que se puede ejercer la opción.", 
+            key="taylor_K"
+        )
     with col3:
-        T = st.slider("Tiempo hasta Vencimiento (T)", 0.1, 5.0, 1.0, help="Tiempo restante hasta el vencimiento de la opción.", key="taylor_T")
+        T = st.slider(
+            "Tiempo hasta Vencimiento (T)", 
+            0.1, 5.0, 1.0, 
+            help="Tiempo restante hasta el vencimiento de la opción.", 
+            key="taylor_T"
+        )
 
     col4, col5 = st.columns(2)
     with col4:
-        r = st.slider("Tasa Libre de Riesgo (r)", 0.0, 0.2, 0.05, help="Tasa de interés libre de riesgo.", key="taylor_r")
+        r = st.slider(
+            "Tasa Libre de Riesgo (r)", 
+            0.0, 0.2, 0.05, 
+            help="Tasa de interés libre de riesgo.", 
+            key="taylor_r"
+        )
     with col5:
-        sigma = st.slider("Volatilidad (σ)", 0.1, 1.0, 0.2, help="Volatilidad del activo subyacente.", key="taylor_sigma")
+        sigma = st.slider(
+            "Volatilidad (σ)", 
+            0.1, 1.0, 0.2, 
+            help="Volatilidad del activo subyacente.", 
+            key="taylor_sigma"
+        )
 
     # Calcular el precio de la opción call usando Black-Scholes
     def black_scholes_call(S, K, T, r, sigma):
@@ -580,9 +708,19 @@ with tab4:
         st.header("⚙️ Ingresa la Función Objetivo y la Restricción")
         col1, col2 = st.columns(2)
         with col1:
-            funcion_objetivo = st.text_input("Función Objetivo (f(x, y)):", "x**2 + y**2", key="lagrange_funcion_objetivo")
+            funcion_objetivo = st.text_input(
+                "Función Objetivo (f(x, y)):", 
+                "x**2 + y**2", 
+                key="lagrange_funcion_objetivo",
+                help="Ingresa una función válida de x e y."
+            )
         with col2:
-            restriccion = st.text_input("Restricción (g(x, y) = 0):", "x + y - 1", key="lagrange_restriccion")
+            restriccion = st.text_input(
+                "Restricción (g(x, y) = 0):", 
+                "x + y - 1", 
+                key="lagrange_restriccion",
+                help="Ingresa una restricción válida de x e y."
+            )
     
         # Definir las variables simbólicas
         x, y, lambda_ = sp.symbols('x y lambda')
@@ -625,68 +763,99 @@ with tab4:
     
         except Exception as e:
             st.error(f"Error al procesar la función o la restricción: {e}")
-    # Página de Paridad Put-Call
-with tab6:
-    st.title("📉 Valor de un Put usando Paridad Put-Call")
 
-    # Descripción de la Paridad Put-Call
-    with st.expander("📚 ¿Qué es la Paridad Put-Call?"):
-        st.markdown("""
-        **Paridad Put-Call:**
-        - La paridad put-call es una relación entre el precio de una opción call y una opción put con el mismo precio de ejercicio y fecha de vencimiento.
-        - La fórmula de paridad put-call es:
-          \[
-          C + K e^{-rT} = P + S
-          \]
-          Donde:
-          - \(C\): Precio de la opción call.
-          - \(P\): Precio de la opción put.
-          - \(S\): Precio del activo subyacente.
-          - \(K\): Precio de ejercicio.
-          - \(r\): Tasa libre de riesgo.
-          - \(T\): Tiempo hasta el vencimiento.
-        - Esta relación se utiliza para calcular el precio de una opción put si se conoce el precio de la opción call, o viceversa.
+    # Página de Paridad Put-Call
+    with tab6:
+        st.title("📉 Valor de un Put usando Paridad Put-Call")
+
+        # Descripción de la Paridad Put-Call
+        with st.expander("📚 ¿Qué es la Paridad Put-Call?"):
+            st.markdown("""
+            **Paridad Put-Call:**
+            - La paridad put-call es una relación entre el precio de una opción call y una opción put con el mismo precio de ejercicio y fecha de vencimiento.
+            - La fórmula de paridad put-call es:
+              \[
+              C + K e^{-rT} = P + S
+              \]
+              Donde:
+              - \(C\): Precio de la opción call.
+              - \(P\): Precio de la opción put.
+              - \(S\): Precio del activo subyacente.
+              - \(K\): Precio de ejercicio.
+              - \(r\): Tasa libre de riesgo.
+              - \(T\): Tiempo hasta el vencimiento.
+            - Esta relación se utiliza para calcular el precio de una opción put si se conoce el precio de la opción call, o viceversa.
+            """)
+
+        # Entrada de parámetros
+        st.header("⚙️ Parámetros de la Opción")
+        col1, col2 = st.columns(2)
+        with col1:
+            S = st.number_input(
+                "Precio del Activo (S)", 
+                value=100.0, 
+                min_value=0.01, 
+                key="put_call_parity_S",
+                help="Precio actual del activo subyacente."
+            )
+            K = st.number_input(
+                "Precio de Ejercicio (K)", 
+                value=100.0, 
+                min_value=0.01, 
+                key="put_call_parity_K",
+                help="Precio al que se puede ejercer la opción."
+            )
+            T = st.number_input(
+                "Tiempo hasta Vencimiento (T)", 
+                value=1.0, 
+                min_value=0.01, 
+                key="put_call_parity_T",
+                help="Tiempo restante hasta el vencimiento de la opción."
+            )
+        with col2:
+            r = st.number_input(
+                "Tasa Libre de Riesgo (r)", 
+                value=0.05, 
+                min_value=0.0, 
+                key="put_call_parity_r",
+                help="Tasa de interés libre de riesgo."
+            )
+            C = st.number_input(
+                "Precio de la Opción Call (C)", 
+                value=10.0, 
+                min_value=0.0, 
+                key="put_call_parity_C",
+                help="Precio de la opción call."
+            )
+
+        # Calcular el precio de la opción put usando la paridad put-call
+        def calcular_put_call_parity(S, K, T, r, C):
+            P = C + K * np.exp(-r * T) - S
+            return P
+
+        # Calcular el precio de la opción put
+        P = calcular_put_call_parity(S, K, T, r, C)
+
+        # Mostrar el resultado
+        st.subheader("💵 Precio de la Opción Put")
+        st.markdown(f"**Precio de la Opción Put (P):** `{P:.4f}`")
+
+        # Mostrar la fórmula de paridad put-call
+        st.subheader("📝 Fórmula de Paridad Put-Call")
+        st.latex(r"""
+        P = C + K e^{-rT} - S
         """)
 
-    # Entrada de parámetros
-    st.header("⚙️ Parámetros de la Opción")
-    col1, col2 = st.columns(2)
-    with col1:
-        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01, key="put_call_parity_S")
-        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01, key="put_call_parity_K")
-        T = st.number_input("Tiempo hasta Vencimiento (T)", value=1.0, min_value=0.01, key="put_call_parity_T")
-    with col2:
-        r = st.number_input("Tasa Libre de Riesgo (r)", value=0.05, min_value=0.0, key="put_call_parity_r")
-        C = st.number_input("Precio de la Opción Call (C)", value=10.0, min_value=0.0, key="put_call_parity_C")
-
-    # Calcular el precio de la opción put usando la paridad put-call
-    def calcular_put_call_parity(S, K, T, r, C):
-        P = C + K * np.exp(-r * T) - S
-        return P
-
-    # Calcular el precio de la opción put
-    P = calcular_put_call_parity(S, K, T, r, C)
-
-    # Mostrar el resultado
-    st.subheader("💵 Precio de la Opción Put")
-    st.markdown(f"**Precio de la Opción Put (P):** `{P:.4f}`")
-
-    # Mostrar la fórmula de paridad put-call
-    st.subheader("📝 Fórmula de Paridad Put-Call")
-    st.latex(r"""
-    P = C + K e^{-rT} - S
-    """)
-
-    # Explicación del cálculo
-    st.markdown("""
-    ### 🎯 Explicación del Cálculo
-    - **Precio de la Opción Call (C):** Precio de la opción call proporcionado por el usuario.
-    - **Precio del Activo (S):** Precio actual del activo subyacente.
-    - **Precio de Ejercicio (K):** Precio al que se puede ejercer la opción.
-    - **Tasa Libre de Riesgo (r):** Tasa de interés libre de riesgo.
-    - **Tiempo hasta Vencimiento (T):** Tiempo restante hasta el vencimiento de la opción.
-    - **Precio de la Opción Put (P):** Precio calculado de la opción put usando la fórmula de paridad put-call.
-    """)
+        # Explicación del cálculo
+        st.markdown("""
+        ### 🎯 Explicación del Cálculo
+        - **Precio de la Opción Call (C):** Precio de la opción call proporcionado por el usuario.
+        - **Precio del Activo (S):** Precio actual del activo subyacente.
+        - **Precio de Ejercicio (K):** Precio al que se puede ejercer la opción.
+        - **Tasa Libre de Riesgo (r):** Tasa de interés libre de riesgo.
+        - **Tiempo hasta Vencimiento (T):** Tiempo restante hasta el vencimiento de la opción.
+        - **Precio de la Opción Put (P):** Precio calculado de la opción put usando la fórmula de paridad put-call.
+        """)
 
 # Pie de página
 st.markdown("---")
