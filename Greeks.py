@@ -42,13 +42,14 @@ st.markdown("""
 st.title("Enjoy Finance 📊")
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "1️⃣ Aproximación de Taylor", 
     "2️⃣ Árbol Binomial", 
     "3️⃣ Black-Scholes", 
     "4️⃣ Expansión de Taylor para Call",
     "5️⃣ Optimización con Lagrange",
-    "6️⃣ Paridad Put-Call"
+    "6️⃣ Paridad Put-Call",
+    "7️⃣ Simulación de Monte Carlo para Opciones"
 ])
 
 # Página de Aproximación de Taylor
@@ -856,6 +857,136 @@ with tab4:
         - **Tiempo hasta Vencimiento (T):** Tiempo restante hasta el vencimiento de la opción.
         - **Precio de la Opción Put (P):** Precio calculado de la opción put usando la fórmula de paridad put-call.
         """)
+# Agregar una nueva pestaña para Monte Carlo
+with tab7:
+    st.title("🎲 Simulación de Monte Carlo para Opciones")
+
+    # Descripción de la simulación de Monte Carlo
+    with st.expander("📚 ¿Qué es la Simulación de Monte Carlo?"):
+        st.markdown("""
+        **Simulación de Monte Carlo:**
+        - La simulación de Monte Carlo es un método numérico que utiliza muestreo aleatorio para estimar el valor de una opción.
+        - Se generan múltiples trayectorias de precios del activo subyacente y se calcula el valor de la opción como el valor esperado de los pagos descontados.
+        """)
+
+    # Entrada de parámetros
+    st.header("⚙️ Parámetros de la Simulación")
+    col1, col2 = st.columns(2)
+    with col1:
+        S_mc = st.number_input(
+            "Precio del Activo (S)", 
+            value=100.0, 
+            min_value=0.01, 
+            key="mc_S",
+            help="Precio actual del activo subyacente."
+        )
+        K_mc = st.number_input(
+            "Precio de Ejercicio (K)", 
+            value=100.0, 
+            min_value=0.01, 
+            key="mc_K",
+            help="Precio al que se puede ejercer la opción."
+        )
+        T_mc = st.number_input(
+            "Tiempo hasta Vencimiento (T)", 
+            value=1.0, 
+            min_value=0.01, 
+            key="mc_T",
+            help="Tiempo restante hasta el vencimiento de la opción."
+        )
+    with col2:
+        r_mc = st.number_input(
+            "Tasa Libre de Riesgo (r)", 
+            value=0.05, 
+            min_value=0.0, 
+            key="mc_r",
+            help="Tasa de interés libre de riesgo."
+        )
+        sigma_mc = st.number_input(
+            "Volatilidad (σ)", 
+            value=0.2, 
+            min_value=0.01, 
+            key="mc_sigma",
+            help="Volatilidad del activo subyacente."
+        )
+        simulations = st.number_input(
+            "Número de Simulaciones", 
+            value=1000, 
+            min_value=100, 
+            key="mc_simulations",
+            help="Número de trayectorias de precios a generar."
+        )
+        steps = st.number_input(
+            "Número de Pasos de Tiempo", 
+            value=100, 
+            min_value=10, 
+            key="mc_steps",
+            help="Número de pasos de tiempo para cada trayectoria."
+        )
+
+    # Función para simular trayectorias de precios
+    def monte_carlo_simulation(S, K, T, r, sigma, simulations, steps):
+        dt = T / steps
+        paths = np.zeros((steps + 1, simulations))
+        paths[0] = S
+
+        for t in range(1, steps + 1):
+            z = np.random.standard_normal(simulations)
+            paths[t] = paths[t - 1] * np.exp((r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * z)
+
+        return paths
+
+    # Función para calcular el precio de la opción call
+    def monte_carlo_call_price(paths, K, r, T):
+        payoffs = np.maximum(paths[-1] - K, 0)
+        call_price = np.exp(-r * T) * np.mean(payoffs)
+        return call_price, payoffs
+
+    # Ejecutar la simulación
+    if st.button("Ejecutar Simulación"):
+        paths = monte_carlo_simulation(S_mc, K_mc, T_mc, r_mc, sigma_mc, simulations, steps)
+        call_price, payoffs = monte_carlo_call_price(paths, K_mc, r_mc, T_mc)
+
+        # Mostrar resultados
+        st.subheader("📊 Resultados de la Simulación")
+        st.markdown(f"**Precio de la Opción Call:** `{call_price:.4f}`")
+
+        # Gráfico de trayectorias de precios
+        st.subheader("📈 Trayectorias de Precios Simuladas")
+        fig_paths = go.Figure()
+        for i in range(min(100, simulations)):  # Mostrar solo 100 trayectorias para claridad
+            fig_paths.add_trace(go.Scatter(
+                x=np.arange(steps + 1),
+                y=paths[:, i],
+                mode='lines',
+                line=dict(width=1),
+                name=f"Trayectoria {i + 1}"
+            ))
+        fig_paths.update_layout(
+            title="Trayectorias de Precios Simuladas",
+            xaxis_title="Pasos de Tiempo",
+            yaxis_title="Precio del Activo",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig_paths, use_container_width=True)
+
+        # Histograma de pagos
+        st.subheader("📊 Histograma de Pagos")
+        fig_hist = go.Figure()
+        fig_hist.add_trace(go.Histogram(
+            x=payoffs,
+            nbinsx=50,
+            marker=dict(color='blue'),
+            name="Pagos"
+        ))
+        fig_hist.update_layout(
+            title="Distribución de Pagos",
+            xaxis_title="Pago",
+            yaxis_title="Frecuencia",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig_hist, use_container_width=True)
+
 
 # Pie de página
 st.markdown("---")
