@@ -988,138 +988,138 @@ with tab7:
         )
         st.plotly_chart(fig_hist, use_container_width=True)
     with tab8:
-        st.title("📊 Explicación Gráfica de la Aproximación de Taylor")
-    
-        # Descripción de la pestaña
-        with st.expander("📚 ¿Por qué el polinomio de Taylor subestima o sobreestima?"):
-            st.markdown("""
-            **Explicación:**
-            - El polinomio de Taylor de primer grado es una aproximación lineal de la función alrededor de un punto \( x_0 \).
-            - El polinomio de segundo grado incluye una corrección cuadrática que captura la curvatura de la función.
-            - Dependiendo de si \( \Delta x > 0 \) o \( \Delta x < 0 \), el polinomio de Taylor puede subestimar o sobreestimar la función original.
-            - Esto se debe a la concavidad de la función en el punto \( x_0 \).
-            """)
-    
-        # Entrada de la función
-        st.header("⚙️ Ingresa una función")
-        function_input = st.text_input(
-            "Ingresa una función de x (por ejemplo, sin(x), exp(x), x**2):", 
-            "x**2", 
-            key="taylor_explanation_function_input",
-            help="Ingresa una función válida de x."
+    st.title("📊 Explicación Gráfica de la Aproximación de Taylor")
+
+    # Descripción de la pestaña
+    with st.expander("📚 ¿Por qué el polinomio de Taylor subestima o sobreestima?"):
+        st.markdown("""
+        **Explicación:**
+        - El polinomio de Taylor de primer grado es una aproximación lineal de la función alrededor de un punto \( x_0 \).
+        - El polinomio de segundo grado incluye una corrección cuadrática que captura la curvatura de la función.
+        - Dependiendo de si \( \Delta x > 0 \) o \( \Delta x < 0 \), el polinomio de Taylor puede subestimar o sobreestimar la función original.
+        - Esto se debe a la concavidad de la función en el punto \( x_0 \).
+        """)
+
+    # Entrada de la función
+    st.header("⚙️ Ingresa una función")
+    function_input = st.text_input(
+        "Ingresa una función de x (por ejemplo, sin(x), exp(x), x**2):", 
+        "x**2", 
+        key="taylor_explanation_function_input",
+        help="Ingresa una función válida de x."
+    )
+
+    # Configuración del gráfico
+    st.header("⚙️ Configuración del gráfico")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        x0 = st.number_input(
+            "Punto de expansión (x0)", 
+            value=1.0, 
+            format="%.4f", 
+            key="taylor_explanation_x0_input",
+            help="Punto alrededor del cual se calculará la expansión de Taylor."
         )
-    
-        # Configuración del gráfico
-        st.header("⚙️ Configuración del gráfico")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            x0 = st.number_input(
-                "Punto de expansión (x0)", 
-                value=1, 
-                format="%.4f", 
-                key="taylor_explanation_x0_input",
-                help="Punto alrededor del cual se calculará la expansión de Taylor."
-            )
-        with col2:
-            x_min = st.number_input(
-                "Límite inferior de x", 
-                value=-2.0, 
-                format="%.4f", 
-                key="taylor_explanation_x_min_input",
-                help="Valor mínimo de x para el gráfico."
-            )
-        with col3:
-            x_max = st.number_input(
-                "Límite superior de x", 
-                value=2.0, 
-                format="%.4f", 
-                key="taylor_explanation_x_max_input",
-                help="Valor máximo de x para el gráfico."
-            )
-    
-        # Definir la variable simbólica
-        x = sp.symbols('x')
-    
+    with col2:
+        x_min = st.number_input(
+            "Límite inferior de x", 
+            value=-2.0, 
+            format="%.4f", 
+            key="taylor_explanation_x_min_input",
+            help="Valor mínimo de x para el gráfico."
+        )
+    with col3:
+        x_max = st.number_input(
+            "Límite superior de x", 
+            value=2.0, 
+            format="%.4f", 
+            key="taylor_explanation_x_max_input",
+            help="Valor máximo de x para el gráfico."
+        )
+
+    # Definir la variable simbólica
+    x = sp.symbols('x')
+
+    try:
+        # Convertir la entrada del usuario en una función simbólica
+        f = sp.sympify(function_input)
+
+        # Calcular las derivadas
+        f_prime = sp.diff(f, x)  # Primera derivada
+        f_double_prime = sp.diff(f_prime, x)  # Segunda derivada
+
+        # Expansión de Taylor de grado 1
+        taylor_1 = f.subs(x, x0) + f_prime.subs(x, x0) * (x - x0)
+
+        # Expansión de Taylor de grado 2
+        taylor_2 = taylor_1 + (f_double_prime.subs(x, x0) / 2) * (x - x0)**2
+
+        # Convertir las funciones simbólicas a funciones numéricas
+        f_np = sp.lambdify(x, f, "numpy")
+        taylor_1_np = sp.lambdify(x, taylor_1, "numpy")
+        taylor_2_np = sp.lambdify(x, taylor_2, "numpy")
+
+        # Crear un rango de valores para x
+        x_vals = np.linspace(x_min, x_max, 500)
+
+        # Evaluar las funciones en el rango de x
         try:
-            # Convertir la entrada del usuario en una función simbólica
-            f = sp.sympify(function_input)
-    
-            # Calcular las derivadas
-            f_prime = sp.diff(f, x)  # Primera derivada
-            f_double_prime = sp.diff(f_prime, x)  # Segunda derivada
-    
-            # Expansión de Taylor de grado 1
-            taylor_1 = f.subs(x, x0) + f_prime.subs(x, x0) * (x - x0)
-    
-            # Expansión de Taylor de grado 2
-            taylor_2 = taylor_1 + (f_double_prime.subs(x, x0) / 2) * (x - x0)**2
-    
-            # Convertir las funciones simbólicas a funciones numéricas
-            f_np = sp.lambdify(x, f, "numpy")
-            taylor_1_np = sp.lambdify(x, taylor_1, "numpy")
-            taylor_2_np = sp.lambdify(x, taylor_2, "numpy")
-    
-            # Crear un rango de valores para x
-            x_vals = np.linspace(x_min, x_max, 500)
-    
-            # Evaluar las funciones en el rango de x
-            try:
-                y_vals = f_np(x_vals)
-                y_taylor_1 = taylor_1_np(x_vals)
-                y_taylor_2 = taylor_2_np(x_vals)
-            except Exception as e:
-                st.error(f"Error al evaluar la función: {e}")
-                st.stop()
-    
-            # Graficar la función original y las aproximaciones de Taylor
-            st.subheader("📊 Gráficas")
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(
-                x=x_vals, 
-                y=y_vals, 
-                mode='lines', 
-                name=f"Función: {function_input}", 
-                line=dict(color='blue', width=2)
-            ))
-            fig.add_trace(go.Scatter(
-                x=x_vals, 
-                y=y_taylor_1, 
-                mode='lines', 
-                name="Taylor Grado 1", 
-                line=dict(color='green', dash='dash', width=2)
-            ))
-            fig.add_trace(go.Scatter(
-                x=x_vals, 
-                y=y_taylor_2, 
-                mode='lines', 
-                name="Taylor Grado 2", 
-                line=dict(color='red', dash='dash', width=2)
-            ))
-            fig.add_vline(
-                x=x0, 
-                line=dict(color='gray', dash='dot'), 
-                annotation_text=f"x0 = {x0}", 
-                annotation_position="top right"
-            )
-            fig.update_layout(
-                title="Aproximación de Taylor",
-                xaxis_title="x",
-                yaxis_title="f(x)",
-                template="plotly_white",
-                legend=dict(x=0.02, y=0.98)
-            )
-            st.plotly_chart(fig, use_container_width=True)
-    
-            # Explicación de subestimación y sobreestimación
-            st.subheader("🎯 Subestimación y Sobrestimación")
-            st.markdown("""
-            - **Subestimación:** Cuando \( \Delta x > 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado subestima la función.
-            - **Sobrestimación:** Cuando \( \Delta x < 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado sobreestima la función.
-            - **Corrección cuadrática:** El polinomio de segundo grado corrige esta subestimación o sobreestimación al incluir la curvatura de la función.
-            """)
-    
+            y_vals = f_np(x_vals)
+            y_taylor_1 = taylor_1_np(x_vals)
+            y_taylor_2 = taylor_2_np(x_vals)
         except Exception as e:
-            st.error(f"Error al procesar la función: {e}")
+            st.error(f"Error al evaluar la función: {e}")
+            st.stop()
+
+        # Graficar la función original y las aproximaciones de Taylor
+        st.subheader("📊 Gráficas")
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_vals, 
+            mode='lines', 
+            name=f"Función: {function_input}", 
+            line=dict(color='blue', width=2)
+        ))
+        fig.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_taylor_1, 
+            mode='lines', 
+            name="Taylor Grado 1", 
+            line=dict(color='green', dash='dash', width=2)
+        ))
+        fig.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_taylor_2, 
+            mode='lines', 
+            name="Taylor Grado 2", 
+            line=dict(color='red', dash='dash', width=2)
+        ))
+        fig.add_vline(
+            x=x0, 
+            line=dict(color='gray', dash='dot'), 
+            annotation_text=f"x0 = {x0}", 
+            annotation_position="top right"
+        )
+        fig.update_layout(
+            title="Aproximación de Taylor",
+            xaxis_title="x",
+            yaxis_title="f(x)",
+            template="plotly_white",
+            legend=dict(x=0.02, y=0.98)
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Explicación de subestimación y sobreestimación
+        st.subheader("🎯 Subestimación y Sobrestimación")
+        st.markdown("""
+        - **Subestimación:** Cuando \( \Delta x > 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado subestima la función.
+        - **Sobrestimación:** Cuando \( \Delta x < 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado sobreestima la función.
+        - **Corrección cuadrática:** El polinomio de segundo grado corrige esta subestimación o sobreestimación al incluir la curvatura de la función.
+        """)
+
+    except Exception as e:
+        st.error(f"Error al procesar la función: {e}")
 
 # Pie de página
 st.markdown("---")
