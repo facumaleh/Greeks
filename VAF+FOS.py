@@ -48,7 +48,8 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "3️⃣ Black-Scholes", 
     "4️⃣ Expansión de Taylor para Call",
     "5️⃣ Optimización con Lagrange",
-    "6️⃣ Paridad Put-Call"
+    "6️⃣ Paridad Put-Call",
+    "7️⃣ Markowitz",
 ])
 
 # Página de Aproximación de Taylor
@@ -677,6 +678,56 @@ with tab6:
     - **Tiempo hasta Vencimiento (T):** Tiempo restante hasta el vencimiento de la opción.
     - **Precio de la Opción Put (P):** Precio calculado de la opción put usando la fórmula de paridad put-call.
     """)
+    # Página de Markowitz y Teoría de Portafolios
+with tab7:
+    st.title("📊 Modelo de Markowitz y Teoría de Portafolios")
+
+    # Descripción del modelo de Markowitz
+    with st.expander("📚 ¿Qué es el Modelo de Markowitz?"):
+        st.markdown("""
+        **Modelo de Markowitz:**
+        - El modelo de Markowitz permite construir portafolios óptimos que maximizan el retorno para un nivel dado de riesgo.
+        - Utiliza la diversificación para reducir el riesgo no sistemático.
+        - La frontera eficiente muestra los portafolios con el mejor retorno esperado para cada nivel de riesgo.
+        """)
+
+    # Entrada de datos históricos de precios
+    st.header("⚙️ Ingresa los Datos Históricos de Precios")
+    uploaded_file = st.file_uploader("Sube un archivo CSV con precios históricos de activos", type=["csv"])
+    
+    if uploaded_file is not None:
+        data = pd.read_csv(uploaded_file)
+        st.write("Datos cargados:")
+        st.write(data.head())
+
+        # Calcular retornos y matriz de covarianza
+        returns = data.pct_change().dropna()
+        cov_matrix = returns.cov()
+        expected_returns = returns.mean()
+
+        # Optimización de portafolios
+        st.header("📊 Optimización de Portafolios")
+        num_portfolios = st.number_input("Número de portafolios a simular", value=1000, min_value=100)
+        risk_free_rate = st.number_input("Tasa libre de riesgo", value=0.05, format="%.4f")
+
+        results = np.zeros((3, num_portfolios))
+        for i in range(num_portfolios):
+            weights = np.random.random(len(expected_returns))
+            weights /= np.sum(weights)
+            portfolio_return = np.sum(weights * expected_returns) * 252
+            portfolio_stddev = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(252)
+            results[0, i] = portfolio_return
+            results[1, i] = portfolio_stddev
+            results[2, i] = (portfolio_return - risk_free_rate) / portfolio_stddev  # Sharpe Ratio
+
+        # Gráfico de la frontera eficiente
+        st.subheader("📈 Frontera Eficiente")
+        fig, ax = plt.subplots()
+        ax.scatter(results[1, :], results[0, :], c=results[2, :], cmap='viridis', marker='o')
+        ax.set_title('Frontera Eficiente')
+        ax.set_xlabel('Riesgo (Desviación Estándar)')
+        ax.set_ylabel('Retorno Esperado')
+        st.pyplot(fig)
 
 # Pie de página
 st.markdown("---")
