@@ -992,7 +992,7 @@ with tab8:
     st.title("📊 Explicación Gráfica de la Aproximación de Taylor")
     st.markdown("""
     Esta herramienta te permite visualizar cómo el polinomio de Taylor de primer y segundo grado aproxima una función alrededor de un punto \( x_0 \).
-    Explora cómo la aproximación subestima o sobreestima la función dependiendo de la concavidad y el valor de \( Dx \).
+    Explora cómo la aproximación subestima o sobreestima la función dependiendo de la concavidad y el valor de \( \Delta x \).
     """)
 
     # Entrada de la función
@@ -1041,6 +1041,11 @@ with tab8:
     try:
         # Convertir la entrada del usuario en una función simbólica
         f = sp.sympify(function_input)
+
+        # Verificar si la función depende de x
+        if not f.has(x):
+            st.error("La función ingresada no depende de \( x \). Ingresa una función válida de \( x \).")
+            st.stop()
 
         # Calcular las derivadas
         f_prime = sp.diff(f, x)  # Primera derivada
@@ -1205,8 +1210,8 @@ with tab8:
         with st.expander("📚 ¿Por qué el polinomio de Taylor subestima o sobreestima?"):
             st.markdown("""
             ### Subestimación y Sobrestimación
-            - **Subestimación:** Cuando \( Dx > 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado subestima la función.
-            - **Sobrestimación:** Cuando \( Dx < 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado sobreestima la función.
+            - **Subestimación:** Cuando \( \Delta x > 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado subestima la función.
+            - **Sobrestimación:** Cuando \( \Delta x < 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado sobreestima la función.
             - **Corrección cuadrática:** El polinomio de segundo grado corrige esta subestimación o sobreestimación al incluir la curvatura de la función.
             """)
 
@@ -1215,8 +1220,8 @@ with tab8:
             ### Resumen
             | Condición               | Comportamiento del Polinomio de Taylor |
             |-------------------------|----------------------------------------|
-            | \( Dx > 0 \) y \( f''(x_0) > 0 \) | Subestima la función |
-            | \( Dx < 0 \) y \( f''(x_0) > 0 \) | Sobrestima la función |
+            | \( \Delta x > 0 \) y \( f''(x_0) > 0 \) | Subestima la función |
+            | \( \Delta x < 0 \) y \( f''(x_0) > 0 \) | Sobrestima la función |
             """)
 
         # Feedback al usuario
@@ -1224,7 +1229,7 @@ with tab8:
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
-
+        
 st.markdown("---")
 st.markdown("""
 **Creado por:** Facundo Maleh  
