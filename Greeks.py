@@ -1071,11 +1071,11 @@ with tab8:
             st.stop()
 
         # Graficar la función original y las aproximaciones de Taylor
-        st.subheader("📊 Gráficas")
-        fig = go.Figure()
+        st.subheader("📊 Aproximación de Taylor")
+        fig_taylor = go.Figure()
 
         # Función original
-        fig.add_trace(go.Scatter(
+        fig_taylor.add_trace(go.Scatter(
             x=x_vals, 
             y=y_vals, 
             mode='lines', 
@@ -1084,7 +1084,7 @@ with tab8:
         ))
 
         # Taylor de primer grado
-        fig.add_trace(go.Scatter(
+        fig_taylor.add_trace(go.Scatter(
             x=x_vals, 
             y=y_taylor_1, 
             mode='lines', 
@@ -1093,7 +1093,7 @@ with tab8:
         ))
 
         # Taylor de segundo grado
-        fig.add_trace(go.Scatter(
+        fig_taylor.add_trace(go.Scatter(
             x=x_vals, 
             y=y_taylor_2, 
             mode='lines', 
@@ -1102,7 +1102,7 @@ with tab8:
         ))
 
         # Línea vertical en el punto de expansión
-        fig.add_vline(
+        fig_taylor.add_vline(
             x=x0, 
             line=dict(color='gray', dash='dot'), 
             annotation_text=f"x₀ = {x0}", 
@@ -1110,7 +1110,7 @@ with tab8:
         )
 
         # Resaltar áreas de subestimación y sobreestimación
-        fig.add_trace(go.Scatter(
+        fig_taylor.add_trace(go.Scatter(
             x=x_vals, 
             y=np.minimum(y_vals, y_taylor_1),  # Área donde Taylor 1 subestima
             fill='tonexty',
@@ -1120,7 +1120,7 @@ with tab8:
             showlegend=False
         ))
 
-        fig.add_trace(go.Scatter(
+        fig_taylor.add_trace(go.Scatter(
             x=x_vals, 
             y=np.maximum(y_vals, y_taylor_1),  # Área donde Taylor 1 sobreestima
             fill='tonexty',
@@ -1130,7 +1130,7 @@ with tab8:
             showlegend=False
         ))
 
-        fig.update_layout(
+        fig_taylor.update_layout(
             title="Aproximación de Taylor",
             xaxis_title="x",
             yaxis_title="f(x)",
@@ -1138,38 +1138,61 @@ with tab8:
             legend=dict(x=0.02, y=0.98),
             hovermode="x unified"  # Tooltip unificado
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig_taylor, use_container_width=True)
 
-        # Gráficas de la primera y segunda derivada
-        st.subheader("📊 Derivadas de la Función")
-        fig_derivatives = go.Figure()
+        # Gráfica de la función original
+        st.subheader("📊 Función Original")
+        fig_original = go.Figure()
+        fig_original.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_vals, 
+            mode='lines', 
+            name=f"Función: {function_input}", 
+            line=dict(color='blue', width=2)
+        ))
+        fig_original.update_layout(
+            title=f"Función Original: {function_input}",
+            xaxis_title="x",
+            yaxis_title="f(x)",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig_original, use_container_width=True)
 
-        # Primera derivada
-        fig_derivatives.add_trace(go.Scatter(
+        # Gráfica de la primera derivada
+        st.subheader("📊 Primera Derivada")
+        fig_prime = go.Figure()
+        fig_prime.add_trace(go.Scatter(
             x=x_vals, 
             y=y_prime, 
             mode='lines', 
-            name="Primera Derivada (Pendiente)", 
+            name=f"Primera Derivada: {sp.latex(f_prime)}", 
             line=dict(color='purple', width=2)
         ))
+        fig_prime.update_layout(
+            title=f"Primera Derivada: {sp.latex(f_prime)}",
+            xaxis_title="x",
+            yaxis_title="f'(x)",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig_prime, use_container_width=True)
 
-        # Segunda derivada
-        fig_derivatives.add_trace(go.Scatter(
+        # Gráfica de la segunda derivada
+        st.subheader("📊 Segunda Derivada")
+        fig_double_prime = go.Figure()
+        fig_double_prime.add_trace(go.Scatter(
             x=x_vals, 
             y=y_double_prime, 
             mode='lines', 
-            name="Segunda Derivada (Concavidad)", 
+            name=f"Segunda Derivada: {sp.latex(f_double_prime)}", 
             line=dict(color='orange', width=2)
         ))
-
-        fig_derivatives.update_layout(
-            title="Derivadas de la Función",
+        fig_double_prime.update_layout(
+            title=f"Segunda Derivada: {sp.latex(f_double_prime)}",
             xaxis_title="x",
-            yaxis_title="Valor de la Derivada",
-            template="plotly_white",
-            legend=dict(x=0.02, y=0.98)
+            yaxis_title="f''(x)",
+            template="plotly_white"
         )
-        st.plotly_chart(fig_derivatives, use_container_width=True)
+        st.plotly_chart(fig_double_prime, use_container_width=True)
 
         # Explicación de subestimación y sobreestimación
         with st.expander("📚 ¿Por qué el polinomio de Taylor subestima o sobreestima?"):
@@ -1193,7 +1216,7 @@ with tab8:
         st.success("¡Gráfica generada con éxito! Explora cómo el polinomio de Taylor aproxima la función.")
 
     except Exception as e:
-        st.error(f"Error al procesar la función: {e}")
+        st.error(f"Error al procesar la función: {e}")        
 st.markdown("---")
 st.markdown("""
 **Creado por:** Facundo Maleh  
