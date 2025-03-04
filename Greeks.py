@@ -42,7 +42,7 @@ st.markdown("""
 st.title("Enjoy Finance 📊")
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9  = st.tabs([
     "1️⃣ Aproximación de Taylor", 
     "2️⃣ Árbol Binomial", 
     "3️⃣ Black-Scholes", 
@@ -50,7 +50,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "5️⃣ Optimización con Lagrange",
     "6️⃣ Paridad Put-Call",
     "7️⃣ Simulación de Monte Carlo para Opciones",
-    "8️⃣ Explicación Gráfica de Taylor"
+    "8️⃣ Explicación Gráfica de Taylor",
+    "9️⃣ Arbitraje Call-Delta-Treasury"
 ])
 
 # Página de Aproximación de Taylor
@@ -1229,6 +1230,135 @@ with tab8:
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
+
+# Pestaña de Arbitraje Call-Delta-Treasury
+with tab9:
+    st.title("📊 Arbitraje: Portafolio -Call + Δ·Stock vs Treasury")
+
+    # Descripción del arbitraje
+    with st.expander("📚 ¿Qué es el arbitraje Call-Delta-Treasury?"):
+        st.markdown("""
+        **Arbitraje Call-Delta-Treasury:**
+        - El arbitraje consiste en construir un portafolio que replique el comportamiento de una opción call usando el subyacente y el Treasury.
+        - El portafolio se compone de:
+          - Vender una opción call (\(-C\)).
+          - Comprar una cantidad \( \Delta \) del subyacente (\( \Delta \cdot S \)).
+          - Invertir el resto en el Treasury (\( B \)).
+        - El valor del portafolio debe ser igual al valor del Treasury en todo momento para que el arbitraje sea perfecto.
+        - La fórmula del arbitraje es:
+          \[
+          -C + \Delta \cdot S + B = 0
+          \]
+        """)
+
+    # Entrada de parámetros
+    st.header("⚙️ Parámetros del Arbitraje")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        S = st.number_input(
+            "Precio del Subyacente (\( S \)):", 
+            value=100.0, 
+            min_value=0.01, 
+            key="arbitrage_S",
+            help="Precio actual del activo subyacente."
+        )
+        K = st.number_input(
+            "Precio de Ejercicio (\( K \)):", 
+            value=100.0, 
+            min_value=0.01, 
+            key="arbitrage_K",
+            help="Precio al que se puede ejercer la opción call."
+        )
+    with col2:
+        C = st.number_input(
+            "Precio de la Opción Call (\( C \)):", 
+            value=10.0, 
+            min_value=0.0, 
+            key="arbitrage_C",
+            help="Precio de la opción call."
+        )
+        delta = st.number_input(
+            "Delta (\( \Delta \)):", 
+            value=0.5, 
+            min_value=0.0, 
+            max_value=1.0, 
+            key="arbitrage_delta",
+            help="Delta de la opción call."
+        )
+    with col3:
+        r = st.number_input(
+            "Tasa Libre de Riesgo (\( r \)):", 
+            value=0.05, 
+            min_value=0.0, 
+            key="arbitrage_r",
+            help="Tasa de interés libre de riesgo."
+        )
+        T = st.number_input(
+            "Tiempo hasta Vencimiento (\( T \)):", 
+            value=1.0, 
+            min_value=0.01, 
+            key="arbitrage_T",
+            help="Tiempo restante hasta el vencimiento de la opción."
+        )
+
+    # Calcular el valor del Treasury
+    B = C - delta * S  # Inversión en el Treasury
+    treasury_value = B * np.exp(r * T)  # Valor futuro del Treasury
+
+    # Calcular el valor del portafolio
+    portfolio_value = -C + delta * S + B
+
+    # Mostrar resultados
+    st.subheader("📊 Resultados del Arbitraje")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Valor del Portafolio", f"{portfolio_value:.4f}")
+    with col2:
+        st.metric("Valor del Treasury", f"{treasury_value:.4f}")
+
+    # Gráfica del arbitraje
+    st.subheader("📈 Evolución del Arbitraje")
+    time_values = np.linspace(0, T, 100)  # Rango de tiempo
+    treasury_values = B * np.exp(r * time_values)  # Valor del Treasury en el tiempo
+    portfolio_values = -C + delta * S + B * np.exp(r * time_values)  # Valor del portafolio en el tiempo
+
+    fig_arbitrage = go.Figure()
+    fig_arbitrage.add_trace(go.Scatter(
+        x=time_values, 
+        y=treasury_values, 
+        mode='lines', 
+        name="Treasury", 
+        line=dict(color='blue', width=2)
+    ))
+    fig_arbitrage.add_trace(go.Scatter(
+        x=time_values, 
+        y=portfolio_values, 
+        mode='lines', 
+        name="Portafolio (-Call + Δ·Stock + B)", 
+        line=dict(color='green', dash='dash', width=2)
+    ))
+    fig_arbitrage.update_layout(
+        title="Evolución del Arbitraje",
+        xaxis_title="Tiempo",
+        yaxis_title="Valor",
+        template="plotly_white",
+        legend=dict(x=0.02, y=0.98)
+    )
+    st.plotly_chart(fig_arbitrage, use_container_width=True)
+
+    # Explicación del resultado
+    with st.expander("📚 Explicación del Resultado"):
+        st.markdown("""
+        - **Valor del Portafolio:** Representa el valor actual del portafolio (\(-C + \Delta \cdot S + B\)).
+        - **Valor del Treasury:** Representa el valor futuro del Treasury (\( B \cdot e^{rT} \)).
+        - **Arbitraje Perfecto:** Si el valor del portafolio es igual al valor del Treasury, el arbitraje es perfecto.
+        - **Gráfica:** Muestra cómo el valor del Treasury y el portafolio evolucionan en el tiempo.
+        """)
+
+    # Feedback al usuario
+    st.success("¡Arbitraje calculado con éxito! Explora cómo el portafolio y el Treasury evolucionan en el tiempo.")
+
+
         
 st.markdown("---")
 st.markdown("""
