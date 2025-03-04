@@ -1202,8 +1202,8 @@ with tab8:
         with st.expander("📚 ¿Por qué el polinomio de Taylor subestima o sobreestima?"):
             st.markdown("""
             ### Subestimación y Sobrestimación
-            - **Subestimación:** Cuando \( Dx > 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado subestima la función.
-            - **Sobrestimación:** Cuando \( Dx < 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado sobreestima la función.
+            - **Subestimación:** Cuando Dx > 0 y la función es cóncava hacia arriba  f''(x_0) > 0 , el polinomio de Taylor de primer grado subestima la función.
+            - **Sobrestimación:** Cuando Dx < 0 y la función es cóncava hacia arriba  f''(x_0) > 0 , el polinomio de Taylor de primer grado sobreestima la función.
             - **Corrección cuadrática:** El polinomio de segundo grado corrige esta subestimación o sobreestimación al incluir la curvatura de la función.
             """)
 
@@ -1213,7 +1213,7 @@ with tab8:
             | Condición               | Comportamiento del Polinomio de Taylor |
             |-------------------------|----------------------------------------|
             |  Dx > 0  y  f''(x_0) > 0  | Subestima la función |
-            | Dx < 0 \ y  f''(x_0) > 0  | Sobrestima la función |
+            | Dx < 0  y  f''(x_0) > 0  | Sobrestima la función |
             """)
 
         # Feedback al usuario
