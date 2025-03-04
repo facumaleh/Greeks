@@ -1212,8 +1212,8 @@ with tab8:
             ### Resumen
             | Condición               | Comportamiento del Polinomio de Taylor |
             |-------------------------|----------------------------------------|
-            | \( \Delta x > 0 \) y \( f''(x_0) > 0 \) | Subestima la función |
-            | \( \Delta x < 0 \) y \( f''(x_0) > 0 \) | Sobrestima la función |
+            | \( Dx > 0 \) y \( f''(x_0) > 0 \) | Subestima la función |
+            | \(Dx < 0 \) y \( f''(x_0) > 0 \) | Sobrestima la función |
             """)
 
         # Feedback al usuario
