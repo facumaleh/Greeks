@@ -51,8 +51,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
     "6️⃣ Paridad Put-Call",
     "7️⃣ Markowitz",
     "8️⃣ CAPM",
-    "9️⃣ Montecarlo",
-    "🔟 Examen Oral"
+    "9️⃣ Montecarlo"
 ])
 
 # Página de Aproximación de Taylor
@@ -681,7 +680,7 @@ with tab6:
     - **Tiempo hasta Vencimiento (T):** Tiempo restante hasta el vencimiento de la opción.
     - **Precio de la Opción Put (P):** Precio calculado de la opción put usando la fórmula de paridad put-call.
     """)
-    # Página de Markowitz y Teoría de Portafolios
+    # Página de Markowitz y Teoría de Portafolios (Mejorada)
 with tab7:
     st.title("📊 Modelo de Markowitz y Teoría de Portafolios")
 
@@ -699,38 +698,64 @@ with tab7:
     uploaded_file = st.file_uploader("Sube un archivo CSV con precios históricos de activos", type=["csv"])
     
     if uploaded_file is not None:
-        data = pd.read_csv(uploaded_file)
+        data = pd.read_csv(uploaded_file, index_col=0, parse_dates=True)
         st.write("Datos cargados:")
         st.write(data.head())
 
-        # Calcular retornos y matriz de covarianza
-        returns = data.pct_change().dropna()
-        cov_matrix = returns.cov()
-        expected_returns = returns.mean()
+        # Selección de activos
+        st.header("📊 Selección de Activos")
+        selected_assets = st.multiselect("Selecciona los activos para el portafolio", data.columns.tolist(), default=data.columns.tolist())
 
-        # Optimización de portafolios
-        st.header("📊 Optimización de Portafolios")
-        num_portfolios = st.number_input("Número de portafolios a simular", value=1000, min_value=100)
-        risk_free_rate = st.number_input("Tasa libre de riesgo", value=0.05, format="%.4f")
+        if len(selected_assets) >= 2:
+            # Calcular retornos y matriz de covarianza
+            returns = data[selected_assets].pct_change().dropna()
+            cov_matrix = returns.cov()
+            expected_returns = returns.mean()
 
-        results = np.zeros((3, num_portfolios))
-        for i in range(num_portfolios):
-            weights = np.random.random(len(expected_returns))
-            weights /= np.sum(weights)
-            portfolio_return = np.sum(weights * expected_returns) * 252
-            portfolio_stddev = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(252)
-            results[0, i] = portfolio_return
-            results[1, i] = portfolio_stddev
-            results[2, i] = (portfolio_return - risk_free_rate) / portfolio_stddev  # Sharpe Ratio
+            # Optimización de portafolios
+            st.header("📈 Optimización de Portafolios")
+            num_portfolios = st.number_input("Número de portafolios a simular", value=5000, min_value=1000)
+            risk_free_rate = st.number_input("Tasa libre de riesgo", value=0.05, format="%.4f")
 
-        # Gráfico de la frontera eficiente
-        st.subheader("📈 Frontera Eficiente")
-        fig, ax = plt.subplots()
-        ax.scatter(results[1, :], results[0, :], c=results[2, :], cmap='viridis', marker='o')
-        ax.set_title('Frontera Eficiente')
-        ax.set_xlabel('Riesgo (Desviación Estándar)')
-        ax.set_ylabel('Retorno Esperado')
-        st.pyplot(fig)
+            results = np.zeros((3, num_portfolios))
+            weights_record = []
+            for i in range(num_portfolios):
+                weights = np.random.random(len(selected_assets))
+                weights /= np.sum(weights)
+                portfolio_return = np.sum(weights * expected_returns) * 252
+                portfolio_stddev = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(252)
+                results[0, i] = portfolio_return
+                results[1, i] = portfolio_stddev
+                results[2, i] = (portfolio_return - risk_free_rate) / portfolio_stddev  # Sharpe Ratio
+                weights_record.append(weights)
+
+            # Encontrar el portafolio óptimo (máximo Sharpe Ratio)
+            max_sharpe_idx = np.argmax(results[2])
+            optimal_weights = weights_record[max_sharpe_idx]
+            optimal_return = results[0, max_sharpe_idx]
+            optimal_risk = results[1, max_sharpe_idx]
+
+            # Gráfico de la frontera eficiente
+            st.subheader("📊 Frontera Eficiente y Portafolio Óptimo")
+            fig, ax = plt.subplots()
+            ax.scatter(results[1, :], results[0, :], c=results[2, :], cmap='viridis', marker='o', alpha=0.5)
+            ax.scatter(optimal_risk, optimal_return, c='red', marker='*', s=200, label='Portafolio Óptimo')
+            ax.set_title('Frontera Eficiente')
+            ax.set_xlabel('Riesgo (Desviación Estándar)')
+            ax.set_ylabel('Retorno Esperado')
+            ax.legend()
+            st.pyplot(fig)
+
+            # Mostrar el portafolio óptimo
+            st.subheader("💵 Portafolio Óptimo")
+            st.markdown(f"**Retorno Esperado:** `{optimal_return:.4f}`")
+            st.markdown(f"**Riesgo (Desviación Estándar):** `{optimal_risk:.4f}`")
+            st.markdown(f"**Ratio de Sharpe:** `{results[2, max_sharpe_idx]:.4f}`")
+            st.write("**Pesos del Portafolio Óptimo:**")
+            for asset, weight in zip(selected_assets, optimal_weights):
+                st.write(f"- **{asset}:** `{weight:.4f}`")
+        else:
+            st.error("Selecciona al menos 2 activos para construir un portafolio.")
 # Página de CAPM
 with tab8:
     st.title("📈 Modelo de Valoración de Activos de Capital (CAPM)")
