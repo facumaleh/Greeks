@@ -52,6 +52,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 ])
 
 # Página de Aproximación de Taylor
+# Página de Aproximación de Taylor
 with tab1:
     st.title("📊 Aproximación de Taylor")
 
@@ -71,13 +72,14 @@ with tab1:
     st.header("⚙️ Configuración del gráfico")
     col1, col2, col3 = st.columns(3)
     with col1:
-        x0 = st.slider("Punto de expansión (x0)", -15.0, 15.0, 0.01, 0.1, help="Punto alrededor del cual se calculará la expansión de Taylor.", key="taylor_x0")
+        x0_slider = st.slider("Punto de expansión (x0)", -15.0, 15.0, 0.01, 0.1, help="Punto alrededor del cual se calculará la expansión de Taylor.", key="taylor_x0_slider")
+        x0 = st.number_input("Ingresa el valor de x0", value=x0_slider, format="%.4f", key="taylor_x0_input")
     with col2:
-        x_min = st.slider("Límite inferior de x", -15.0, 15.0, -5.0, 0.1, help="Valor mínimo de x para el gráfico.", key="taylor_x_min")
+        x_min_slider = st.slider("Límite inferior de x", -15.0, 15.0, -5.0, 0.1, help="Valor mínimo de x para el gráfico.", key="taylor_x_min_slider")
+        x_min = st.number_input("Ingresa el límite inferior de x", value=x_min_slider, format="%.4f", key="taylor_x_min_input")
     with col3:
-        x_max = st.slider("Límite superior de x", -15.0, 15.0, 5.0, 0.1, help="Valor máximo de x para el gráfico.", key="taylor_x_max")
-
-    # Definir la variable simbólica
+        x_max_slider = st.slider("Límite superior de x", -15.0, 15.0, 5.0, 0.1, help="Valor máximo de x para el gráfico.", key="taylor_x_max_slider")
+        x_max = st.number_input("Ingresa el límite superior de x", value=x_max_slider, format="%.4f", key="taylor_x_max_input")
     x = sp.symbols('x')
 
     try:
@@ -148,12 +150,12 @@ with tab2:
     st.header("⚙️ Parámetros del Modelo")
     col1, col2 = st.columns(2)
     with col1:
-        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01, key="binomial_S")
-        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01, key="binomial_K")
-        U = st.number_input("Factor de Subida (U)", value=1.1, min_value=1.0, key="binomial_U")
+        S = st.number_input("Precio del Activo (S)", value=100.0, min_value=0.01, format="%.4f", key="binomial_S")
+        K = st.number_input("Precio de Ejercicio (K)", value=100.0, min_value=0.01, format="%.4f", key="binomial_K")
+        U = st.number_input("Factor de Subida (U)", value=1.1, min_value=1.0, format="%.4f", key="binomial_U")
     with col2:
-        D = st.number_input("Factor de Bajada (D)", value=0.9, max_value=1.0, key="binomial_D")
-        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.05, min_value=1.0, key="binomial_R")
+        D = st.number_input("Factor de Bajada (D)", value=0.9, max_value=1.0, format="%.4f", key="binomial_D")
+        R = st.number_input("Factor de Capitalización (R = 1 + Rf)", value=1.05, min_value=1.0, format="%.4f", key="binomial_R")
         periods = st.number_input("Número de Periodos", value=3, min_value=1, key="binomial_periods")
 
     # Función para calcular el precio de la opción call usando árbol binomial
@@ -192,51 +194,65 @@ with tab2:
     # Calcular el árbol binomial
     asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
 
-    # Función para graficar un árbol binomial
-    def plot_binomial_tree(values, title, ax):
-        G = nx.Graph()
-        pos = {}
-        labels = {}
-        for i in range(values.shape[0]):
-            for j in range(i + 1):
-                node = (i, j)
-                G.add_node(node)
-                pos[node] = (i, -j + i / 2)  # Ajustar la posición vertical
-                labels[node] = f"{values[i, j]:.2f}"
-                if i > 0:
-                    parent = (i - 1, j) if j < i else (i - 1, j - 1)
-                    G.add_edge(parent, node)
+# Función para graficar un árbol binomial con mejor diseño
+def plot_binomial_tree(values, title, ax):
+    G = nx.Graph()
+    pos = {}
+    labels = {}
+    
+    # Crear nodos y conexiones
+    for i in range(values.shape[0]):
+        for j in range(i + 1):
+            node = (i, j)
+            G.add_node(node)
+            pos[node] = (i, -j + i / 2)  # Ajustar la posición vertical
+            labels[node] = f"{values[i, j]:.4f}"  # Mostrar valores con 4 decimales
+            if i > 0:
+                parent = (i - 1, j) if j < i else (i - 1, j - 1)
+                G.add_edge(parent, node)
 
-        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="red", font_size=10, font_weight="bold", ax=ax)
-        ax.set_title(title)
+    # Dibujar el árbol
+    node_size = 2000  # Tamaño de los nodos
+    font_size = 10    # Tamaño de la fuente
+    node_color = "#1f78b4"  # Color de los nodos (azul)
+    edge_color = "#333333"  # Color de las conexiones (gris oscuro)
+    font_color = "white"    # Color de la fuente (blanco)
 
-    # Mostrar los árboles binomiales uno al lado del otro
-    st.subheader("📊 Árboles Binomiales")
-    col1, col2, col3, col4 = st.columns(4)
+    nx.draw_networkx_nodes(G, pos, node_size=node_size, node_color=node_color, ax=ax)
+    nx.draw_networkx_edges(G, pos, edge_color=edge_color, width=2, ax=ax)
+    nx.draw_networkx_labels(G, pos, labels, font_size=font_size, font_color=font_color, font_weight="bold", ax=ax)
 
-    with col1:
-        fig1, ax1 = plt.subplots(figsize=(6, 4))
-        plot_binomial_tree(asset_prices, "Árbol de Precios del Activo", ax1)
-        st.pyplot(fig1)
+    # Estilo del gráfico
+    ax.set_title(title, fontsize=14, fontweight="bold", pad=20)
+    ax.set_facecolor("#f7f7f7")  # Fondo gris claro
+    ax.grid(False)  # Desactivar la cuadrícula
+    ax.axis("off")  # Ocultar ejes
 
-    with col2:
-        fig2, ax2 = plt.subplots(figsize=(6, 4))
-        plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call", ax2)
-        st.pyplot(fig2)
+# Mostrar los árboles binomiales uno al lado del otro
+st.subheader("📊 Árboles Binomiales")
+col1, col2, col3, col4 = st.columns(4)
 
-    with col3:
-        fig3, ax3 = plt.subplots(figsize=(6, 4))
-        plot_binomial_tree(deltas, "Árbol de Deltas (Δ)", ax3)
-        st.pyplot(fig3)
+with col1:
+    fig1, ax1 = plt.subplots(figsize=(6, 4))
+    plot_binomial_tree(asset_prices, "Árbol de Precios del Activo", ax1)
+    st.pyplot(fig1)
 
-    with col4:
-        fig4, ax4 = plt.subplots(figsize=(6, 4))
-        plot_binomial_tree(debts, "Árbol de Deudas (B)", ax4)
-        st.pyplot(fig4)
+with col2:
+    fig2, ax2 = plt.subplots(figsize=(6, 4))
+    plot_binomial_tree(option_prices, "Árbol de Precios de la Opción Call", ax2)
+    st.pyplot(fig2)
 
-    # Mostrar el precio final de la opción
+with col3:
+    fig3, ax3 = plt.subplots(figsize=(6, 4))
+    plot_binomial_tree(deltas, "Árbol de Deltas (Δ)", ax3)
+    st.pyplot(fig3)
+
+with col4:
+    fig4, ax4 = plt.subplots(figsize=(6, 4))
+    plot_binomial_tree(debts, "Árbol de Deudas (B)", ax4)
+    st.pyplot(fig4)
     st.markdown(f"**Precio de la Opción Call:** `{option_prices[0, 0]:.4f}`")
-
+    
 # Página de Black-Scholes
 with tab3:
     st.title("📈 Visualizador de Letras Griegas en Black-Scholes")
