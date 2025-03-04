@@ -987,7 +987,7 @@ with tab7:
             template="plotly_white"
         )
         st.plotly_chart(fig_hist, use_container_width=True)
-    with tab8:
+   with tab8:
         # Título y descripción
         st.title("📊 Explicación Gráfica de la Aproximación de Taylor")
         st.markdown("""
@@ -1053,6 +1053,8 @@ with tab7:
             f_np = sp.lambdify(x, f, "numpy")
             taylor_1_np = sp.lambdify(x, taylor_1, "numpy")
             taylor_2_np = sp.lambdify(x, taylor_2, "numpy")
+            f_prime_np = sp.lambdify(x, f_prime, "numpy")
+            f_double_prime_np = sp.lambdify(x, f_double_prime, "numpy")
     
             # Crear un rango de valores para x
             x_vals = np.linspace(x_min, x_max, 500)
@@ -1062,6 +1064,8 @@ with tab7:
                 y_vals = f_np(x_vals)
                 y_taylor_1 = taylor_1_np(x_vals)
                 y_taylor_2 = taylor_2_np(x_vals)
+                y_prime = f_prime_np(x_vals)
+                y_double_prime = f_double_prime_np(x_vals)
             except Exception as e:
                 st.error(f"Error al evaluar la función: {e}")
                 st.stop()
@@ -1136,20 +1140,60 @@ with tab7:
             )
             st.plotly_chart(fig, use_container_width=True)
     
+            # Gráficas de la primera y segunda derivada
+            st.subheader("📊 Derivadas de la Función")
+            fig_derivatives = go.Figure()
+    
+            # Primera derivada
+            fig_derivatives.add_trace(go.Scatter(
+                x=x_vals, 
+                y=y_prime, 
+                mode='lines', 
+                name="Primera Derivada (Pendiente)", 
+                line=dict(color='purple', width=2)
+            ))
+    
+            # Segunda derivada
+            fig_derivatives.add_trace(go.Scatter(
+                x=x_vals, 
+                y=y_double_prime, 
+                mode='lines', 
+                name="Segunda Derivada (Concavidad)", 
+                line=dict(color='orange', width=2)
+            ))
+    
+            fig_derivatives.update_layout(
+                title="Derivadas de la Función",
+                xaxis_title="x",
+                yaxis_title="Valor de la Derivada",
+                template="plotly_white",
+                legend=dict(x=0.02, y=0.98)
+            )
+            st.plotly_chart(fig_derivatives, use_container_width=True)
+    
             # Explicación de subestimación y sobreestimación
             with st.expander("📚 ¿Por qué el polinomio de Taylor subestima o sobreestima?"):
                 st.markdown("""
+                ### Subestimación y Sobrestimación
                 - **Subestimación:** Cuando \( \Delta x > 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado subestima la función.
                 - **Sobrestimación:** Cuando \( \Delta x < 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado sobreestima la función.
                 - **Corrección cuadrática:** El polinomio de segundo grado corrige esta subestimación o sobreestimación al incluir la curvatura de la función.
+                """)
+    
+                # Tabla resumen
+                st.markdown("""
+                ### Resumen
+                | Condición               | Comportamiento del Polinomio de Taylor |
+                |-------------------------|----------------------------------------|
+                | \( \Delta x > 0 \) y \( f''(x_0) > 0 \) | Subestima la función |
+                | \( \Delta x < 0 \) y \( f''(x_0) > 0 \) | Sobrestima la función |
                 """)
     
             # Feedback al usuario
             st.success("¡Gráfica generada con éxito! Explora cómo el polinomio de Taylor aproxima la función.")
     
         except Exception as e:
-            st.error(f"Error al procesar la función: {e}")
-# Pie de página
+            st.error(f"Error al procesar la función: {e}")# Pie de página
 st.markdown("---")
 st.markdown("""
 **Creado por:** Facundo Maleh  
