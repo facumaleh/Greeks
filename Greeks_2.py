@@ -42,13 +42,15 @@ st.markdown("""
 st.title("Enjoy Finance 📊")
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "1️⃣ Aproximación de Taylor", 
     "2️⃣ Árbol Binomial", 
     "3️⃣ Black-Scholes", 
     "4️⃣ Expansión de Taylor para Call",
     "5️⃣ Optimización con Lagrange",
-    "6️⃣ Paridad Put-Call"
+    "6️⃣ Paridad Put-Call",
+    "7️⃣ Simulación de Monte Carlo para Opciones",
+    "8️⃣ Explicación Gráfica de Taylor"
 ])
 
 # Página de Aproximación de Taylor
@@ -856,8 +858,378 @@ with tab4:
         - **Tiempo hasta Vencimiento (T):** Tiempo restante hasta el vencimiento de la opción.
         - **Precio de la Opción Put (P):** Precio calculado de la opción put usando la fórmula de paridad put-call.
         """)
+# Agregar una nueva pestaña para Monte Carlo
+with tab7:
+    st.title("🎲 Simulación de Monte Carlo para Opciones")
 
-# Pie de página
+    # Descripción de la simulación de Monte Carlo
+    with st.expander("📚 ¿Qué es la Simulación de Monte Carlo?"):
+        st.markdown("""
+        **Simulación de Monte Carlo:**
+        - La simulación de Monte Carlo es un método numérico que utiliza muestreo aleatorio para estimar el valor de una opción.
+        - Se generan múltiples trayectorias de precios del activo subyacente y se calcula el valor de la opción como el valor esperado de los pagos descontados.
+        """)
+
+    # Entrada de parámetros
+    st.header("⚙️ Parámetros de la Simulación")
+    col1, col2 = st.columns(2)
+    with col1:
+        S_mc = st.number_input(
+            "Precio del Activo (S)", 
+            value=100.0, 
+            min_value=0.01, 
+            key="mc_S",
+            help="Precio actual del activo subyacente."
+        )
+        K_mc = st.number_input(
+            "Precio de Ejercicio (K)", 
+            value=100.0, 
+            min_value=0.01, 
+            key="mc_K",
+            help="Precio al que se puede ejercer la opción."
+        )
+        T_mc = st.number_input(
+            "Tiempo hasta Vencimiento (T)", 
+            value=1.0, 
+            min_value=0.01, 
+            key="mc_T",
+            help="Tiempo restante hasta el vencimiento de la opción."
+        )
+    with col2:
+        r_mc = st.number_input(
+            "Tasa Libre de Riesgo (r)", 
+            value=0.05, 
+            min_value=0.0, 
+            key="mc_r",
+            help="Tasa de interés libre de riesgo."
+        )
+        sigma_mc = st.number_input(
+            "Volatilidad (σ)", 
+            value=0.2, 
+            min_value=0.01, 
+            key="mc_sigma",
+            help="Volatilidad del activo subyacente."
+        )
+        simulations = st.number_input(
+            "Número de Simulaciones", 
+            value=1000, 
+            min_value=100, 
+            key="mc_simulations",
+            help="Número de trayectorias de precios a generar."
+        )
+        steps = st.number_input(
+            "Número de Pasos de Tiempo", 
+            value=100, 
+            min_value=10, 
+            key="mc_steps",
+            help="Número de pasos de tiempo para cada trayectoria."
+        )
+
+    # Función para simular trayectorias de precios
+    def monte_carlo_simulation(S, K, T, r, sigma, simulations, steps):
+        dt = T / steps
+        paths = np.zeros((steps + 1, simulations))
+        paths[0] = S
+
+        for t in range(1, steps + 1):
+            z = np.random.standard_normal(simulations)
+            paths[t] = paths[t - 1] * np.exp((r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * z)
+
+        return paths
+
+    # Función para calcular el precio de la opción call
+    def monte_carlo_call_price(paths, K, r, T):
+        payoffs = np.maximum(paths[-1] - K, 0)
+        call_price = np.exp(-r * T) * np.mean(payoffs)
+        return call_price, payoffs
+
+    # Ejecutar la simulación
+    if st.button("Ejecutar Simulación"):
+        paths = monte_carlo_simulation(S_mc, K_mc, T_mc, r_mc, sigma_mc, simulations, steps)
+        call_price, payoffs = monte_carlo_call_price(paths, K_mc, r_mc, T_mc)
+
+        # Mostrar resultados
+        st.subheader("📊 Resultados de la Simulación")
+        st.markdown(f"**Precio de la Opción Call:** `{call_price:.4f}`")
+
+        # Gráfico de trayectorias de precios
+        st.subheader("📈 Trayectorias de Precios Simuladas")
+        fig_paths = go.Figure()
+        for i in range(min(100, simulations)):  # Mostrar solo 100 trayectorias para claridad
+            fig_paths.add_trace(go.Scatter(
+                x=np.arange(steps + 1),
+                y=paths[:, i],
+                mode='lines',
+                line=dict(width=1),
+                name=f"Trayectoria {i + 1}"
+            ))
+        fig_paths.update_layout(
+            title="Trayectorias de Precios Simuladas",
+            xaxis_title="Pasos de Tiempo",
+            yaxis_title="Precio del Activo",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig_paths, use_container_width=True)
+
+        # Histograma de pagos
+        st.subheader("📊 Histograma de Pagos")
+        fig_hist = go.Figure()
+        fig_hist.add_trace(go.Histogram(
+            x=payoffs,
+            nbinsx=50,
+            marker=dict(color='blue'),
+            name="Pagos"
+        ))
+        fig_hist.update_layout(
+            title="Distribución de Pagos",
+            xaxis_title="Pago",
+            yaxis_title="Frecuencia",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig_hist, use_container_width=True)
+with tab8:
+    # Título y descripción
+    st.title("📊 Explicación Gráfica de la Aproximación de Taylor")
+    st.markdown("""
+    Esta herramienta te permite visualizar cómo el polinomio de Taylor de primer y segundo grado aproxima una función alrededor de un punto \( x_0 \).
+    Explora cómo la aproximación subestima o sobreestima la función dependiendo de la concavidad y el valor de \( \Dx \).
+    """)
+
+    # Entrada de la función
+    st.header("⚙️ Ingresa una función")
+    function_input = st.text_input(
+        "Ingresa una función de \( x \) (por ejemplo, `x**2`, `sin(x)`, `exp(x)`):", 
+        "x**2", 
+        key="taylor_explanation_function_input",
+        help="Ingresa una función válida de \( x \). Usa '**' para exponenciación (por ejemplo, 'x**2')."
+    )
+
+    # Reemplazar '^' por '**' en la función ingresada
+    function_input = function_input.replace("^", "**")
+
+    # Configuración del gráfico en columnas
+    st.header("⚙️ Configuración del gráfico")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        x0 = st.number_input(
+            "Punto de expansión \( x_0 \):", 
+            value=10.0, 
+            format="%.4f", 
+            key="taylor_explanation_x0_input",
+            help="Punto alrededor del cual se calculará la expansión de Taylor."
+        )
+    with col2:
+        x_min = st.number_input(
+            "Límite inferior de \( x \):", 
+            value=5.0, 
+            format="%.4f", 
+            key="taylor_explanation_x_min_input",
+            help="Valor mínimo de \( x \) para el gráfico."
+        )
+    with col3:
+        x_max = st.number_input(
+            "Límite superior de \( x \):", 
+            value=15.0, 
+            format="%.4f", 
+            key="taylor_explanation_x_max_input",
+            help="Valor máximo de \( x \) para el gráfico."
+        )
+
+    # Definir la variable simbólica
+    x = sp.symbols('x')
+
+    try:
+        # Convertir la entrada del usuario en una función simbólica
+        f = sp.sympify(function_input)
+
+        # Verificar si la función depende de x
+        if not f.has(x):
+            st.error("La función ingresada no depende de \( x \). Ingresa una función válida de \( x \).")
+            st.stop()
+
+        # Calcular las derivadas
+        f_prime = sp.diff(f, x)  # Primera derivada
+        f_double_prime = sp.diff(f_prime, x)  # Segunda derivada
+
+        # Expansión de Taylor de grado 1
+        taylor_1 = f.subs(x, x0) + f_prime.subs(x, x0) * (x - x0)
+
+        # Expansión de Taylor de grado 2
+        taylor_2 = taylor_1 + (f_double_prime.subs(x, x0) / 2) * (x - x0)**2
+
+        # Convertir las funciones simbólicas a funciones numéricas
+        f_np = sp.lambdify(x, f, "numpy")
+        taylor_1_np = sp.lambdify(x, taylor_1, "numpy")
+        taylor_2_np = sp.lambdify(x, taylor_2, "numpy")
+        f_prime_np = sp.lambdify(x, f_prime, "numpy")
+        f_double_prime_np = sp.lambdify(x, f_double_prime, "numpy")
+
+        # Crear un rango de valores para x
+        x_vals = np.linspace(x_min, x_max, 500)
+
+        # Evaluar las funciones en el rango de x
+        try:
+            y_vals = f_np(x_vals)
+            y_taylor_1 = taylor_1_np(x_vals)
+            y_taylor_2 = taylor_2_np(x_vals)
+            y_prime = f_prime_np(x_vals)
+            y_double_prime = f_double_prime_np(x_vals)
+        except Exception as e:
+            st.error(f"Error al evaluar la función: {e}")
+            st.stop()
+
+        # Graficar la función original y las aproximaciones de Taylor
+        st.subheader("📊 Aproximación de Taylor")
+        fig_taylor = go.Figure()
+
+        # Función original
+        fig_taylor.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_vals, 
+            mode='lines', 
+            name=f"Función: {function_input}", 
+            line=dict(color='blue', width=2)
+        ))
+
+        # Taylor de primer grado
+        fig_taylor.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_taylor_1, 
+            mode='lines', 
+            name="Taylor Grado 1", 
+            line=dict(color='green', dash='dash', width=2)
+        ))
+
+        # Taylor de segundo grado
+        fig_taylor.add_trace(go.Scatter(
+            x=x_vals, 
+            y=y_taylor_2, 
+            mode='lines', 
+            name="Taylor Grado 2", 
+            line=dict(color='red', dash='dash', width=2)
+        ))
+
+        # Línea vertical en el punto de expansión
+        fig_taylor.add_vline(
+            x=x0, 
+            line=dict(color='gray', dash='dot'), 
+            annotation_text=f"x₀ = {x0}", 
+            annotation_position="top right"
+        )
+
+        # Resaltar áreas de subestimación y sobreestimación
+        fig_taylor.add_trace(go.Scatter(
+            x=x_vals, 
+            y=np.minimum(y_vals, y_taylor_1),  # Área donde Taylor 1 subestima
+            fill='tonexty',
+            mode='none',
+            name='Taylor 1 Subestima',
+            fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
+            showlegend=False
+        ))
+
+        fig_taylor.add_trace(go.Scatter(
+            x=x_vals, 
+            y=np.maximum(y_vals, y_taylor_1),  # Área donde Taylor 1 sobreestima
+            fill='tonexty',
+            mode='none',
+            name='Taylor 1 Sobrestima',
+            fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
+            showlegend=False
+        ))
+
+        fig_taylor.update_layout(
+            title="Aproximación de Taylor",
+            xaxis_title="x",
+            yaxis_title="f(x)",
+            template="plotly_white",
+            legend=dict(x=0.02, y=0.98),
+            hovermode="x unified"  # Tooltip unificado
+        )
+        st.plotly_chart(fig_taylor, use_container_width=True)
+
+        # Gráficas de la función original, primera derivada y segunda derivada en una fila
+        st.subheader("📊 Función y Derivadas")
+        col1, col2, col3 = st.columns(3)
+
+        # Gráfica de la función original
+        with col1:
+            fig_original = go.Figure()
+            fig_original.add_trace(go.Scatter(
+                x=x_vals, 
+                y=y_vals, 
+                mode='lines', 
+                name=f"Función: {function_input}", 
+                line=dict(color='blue', width=2)
+            ))
+            fig_original.update_layout(
+                title=f"Función Original: {function_input}",
+                xaxis_title="x",
+                yaxis_title="f(x)",
+                template="plotly_white"
+            )
+            st.plotly_chart(fig_original, use_container_width=True)
+
+        # Gráfica de la primera derivada
+        with col2:
+            fig_prime = go.Figure()
+            fig_prime.add_trace(go.Scatter(
+                x=x_vals, 
+                y=y_prime, 
+                mode='lines', 
+                name=f"Primera Derivada: {sp.latex(f_prime)}", 
+                line=dict(color='purple', width=2)
+            ))
+            fig_prime.update_layout(
+                title=f"Primera Derivada: {sp.latex(f_prime)}",
+                xaxis_title="x",
+                yaxis_title="f'(x)",
+                template="plotly_white"
+            )
+            st.plotly_chart(fig_prime, use_container_width=True)
+
+        # Gráfica de la segunda derivada
+        with col3:
+            fig_double_prime = go.Figure()
+            fig_double_prime.add_trace(go.Scatter(
+                x=x_vals, 
+                y=y_double_prime, 
+                mode='lines', 
+                name=f"Segunda Derivada: {sp.latex(f_double_prime)}", 
+                line=dict(color='orange', width=2)
+            ))
+            fig_double_prime.update_layout(
+                title=f"Segunda Derivada: {sp.latex(f_double_prime)}",
+                xaxis_title="x",
+                yaxis_title="f''(x)",
+                template="plotly_white"
+            )
+            st.plotly_chart(fig_double_prime, use_container_width=True)
+
+        # Explicación de subestimación y sobreestimación
+        with st.expander("📚 ¿Por qué el polinomio de Taylor subestima o sobreestima?"):
+            st.markdown("""
+            ### Subestimación y Sobrestimación
+            - **Subestimación:** Cuando \( \Dx > 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado subestima la función.
+            - **Sobrestimación:** Cuando \( \Dx < 0 \) y la función es cóncava hacia arriba (\( f''(x_0) > 0 \)), el polinomio de Taylor de primer grado sobreestima la función.
+            - **Corrección cuadrática:** El polinomio de segundo grado corrige esta subestimación o sobreestimación al incluir la curvatura de la función.
+            """)
+
+            # Tabla resumen
+            st.markdown("""
+            ### Resumen
+            | Condición               | Comportamiento del Polinomio de Taylor |
+            |-------------------------|----------------------------------------|
+            | \( \Dx > 0 \) y \( f''(x_0) > 0 \) | Subestima la función |
+            | \( \Dx < 0 \) y \( f''(x_0) > 0 \) | Sobrestima la función |
+            """)
+
+        # Feedback al usuario
+        st.success("¡Gráfica generada con éxito! Explora cómo el polinomio de Taylor aproxima la función.")
+
+    except Exception as e:
+        st.error(f"Error al procesar la función: {e}")
+        
 st.markdown("---")
 st.markdown("""
 **Creado por:** Facundo Maleh  
