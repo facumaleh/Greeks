@@ -299,7 +299,7 @@ with tab2:
                     G.add_edge(parent, node)
 
         # Dibujar el árbol
-        nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color="red", font_size=10, font_weight="bold", ax=ax)
+        nx.draw(G, pos, labels=labels, with_labels=True, node_size=1000, node_color="red", font_size=10, font_weight="bold", ax=ax)
         ax.set_title(title)
 
     # Mostrar los árboles binomiales uno al lado del otro
