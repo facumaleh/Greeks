@@ -987,7 +987,7 @@ with tab7:
             template="plotly_white"
         )
         st.plotly_chart(fig_hist, use_container_width=True)
-   with tab8:
+       with tab8:
         # Título y descripción
         st.title("📊 Explicación Gráfica de la Aproximación de Taylor")
         st.markdown("""
