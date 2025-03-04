@@ -1015,7 +1015,7 @@ with tab7:
         with col1:
             x0 = st.number_input(
                 "Punto de expansión (x0)", 
-                value=0.0, 
+                value=1, 
                 format="%.4f", 
                 key="taylor_explanation_x0_input",
                 help="Punto alrededor del cual se calculará la expansión de Taylor."
