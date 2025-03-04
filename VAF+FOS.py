@@ -42,7 +42,7 @@ st.markdown("""
 st.title("Enjoy Finance")
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
     "1️⃣ Aproximación de Taylor", 
     "2️⃣ Árbol Binomial", 
     "3️⃣ Black-Scholes", 
@@ -50,6 +50,9 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "5️⃣ Optimización con Lagrange",
     "6️⃣ Paridad Put-Call",
     "7️⃣ Markowitz",
+    "8️⃣ CAPM",
+    "9️⃣ Montecarlo",
+    "🔟 Examen Oral"
 ])
 
 # Página de Aproximación de Taylor
