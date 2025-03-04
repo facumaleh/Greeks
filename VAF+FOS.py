@@ -778,6 +778,58 @@ with tab8:
         template="plotly_white"
     )
     st.plotly_chart(fig, use_container_width=True)
+    # Página de Simulación de Montecarlo
+with tab9:
+    st.title("🎲 Simulación de Montecarlo para Valuación de Opciones")
+
+    # Descripción de la simulación de Montecarlo
+    with st.expander("📚 ¿Qué es la Simulación de Montecarlo?"):
+        st.markdown("""
+        **Simulación de Montecarlo:**
+        - La simulación de Montecarlo es una técnica numérica que utiliza muestreo aleatorio para estimar resultados.
+        - En finanzas, se utiliza para valuar opciones simulando múltiples caminos posibles del precio del activo subyacente.
+        """)
+
+    # Entrada de parámetros
+    st.header("⚙️ Parámetros de la Simulación")
+    S0 = st.number_input("Precio inicial del activo (S0)", value=100.0, format="%.4f")
+    K = st.number_input("Precio de ejercicio (K)", value=100.0, format="%.4f")
+    T = st.number_input("Tiempo hasta vencimiento (T)", value=1.0, format="%.4f")
+    r = st.number_input("Tasa libre de riesgo (r)", value=0.05, format="%.4f")
+    sigma = st.number_input("Volatilidad (σ)", value=0.2, format="%.4f")
+    num_simulations = st.number_input("Número de simulaciones", value=1000, min_value=100)
+
+    # Simulación de Montecarlo
+    def monte_carlo_option_price(S0, K, T, r, sigma, num_simulations):
+        np.random.seed(42)
+        dt = T / 252
+        paths = np.zeros((252, num_simulations))
+        paths[0] = S0
+        for t in range(1, 252):
+            z = np.random.standard_normal(num_simulations)
+            paths[t] = paths[t - 1] * np.exp((r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * z)
+        option_prices = np.maximum(paths[-1] - K, 0)
+        option_price = np.exp(-r * T) * np.mean(option_prices)
+        return paths, option_price
+
+    paths, option_price = monte_carlo_option_price(S0, K, T, r, sigma, num_simulations)
+
+    # Mostrar el resultado
+    st.subheader("💵 Precio de la Opción Call")
+    st.markdown(f"**Precio estimado de la opción:** `{option_price:.4f}`")
+
+    # Gráfico de los caminos simulados
+    st.subheader("📊 Caminos Simulados del Precio del Activo")
+    fig = go.Figure()
+    for i in range(min(100, num_simulations)):  # Mostrar solo 100 caminos para claridad
+        fig.add_trace(go.Scatter(x=np.arange(252), y=paths[:, i], mode='lines', line=dict(width=1)))
+    fig.update_layout(
+        title="Simulación de Montecarlo - Caminos del Precio del Activo",
+        xaxis_title="Tiempo",
+        yaxis_title="Precio del Activo",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig, use_container_width=True)
     
 # Pie de página
 st.markdown("---")
