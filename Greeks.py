@@ -1232,6 +1232,7 @@ with tab8:
         st.error(f"Error al procesar la función: {e}")
 
 # Pestaña de Explicación del Teorema de Black-Scholes
+# Pestaña de Explicación del Teorema de Black-Scholes
 with tab9:
     st.title("📊 Explicación del Teorema de Black-Scholes")
 
@@ -1302,7 +1303,6 @@ with tab9:
 
     # Calcular el precio de la opción call usando Black-Scholes
     def black_scholes_call(S, K, T, r, sigma):
-        from scipy.stats import norm
         d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
         d2 = d1 - sigma * np.sqrt(T)
         call_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
@@ -1326,7 +1326,6 @@ with tab9:
     """)
 
     # Calcular Delta y el valor del Treasury
-    from scipy.stats import norm
     d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
     delta = norm.cdf(d1)  # Delta de la opción call
     B = call_price - delta * S  # Inversión en el Treasury
@@ -1386,7 +1385,7 @@ with tab9:
         "Greek": ["Delta", "Gamma", "Theta", "Vega", "Rho"],
         "Valor": [delta, 0.1, -0.05, 0.2, 0.1]  # Valores de ejemplo
     }
-    df_greeks = pd.DataFrame(greeks_data)
+    df_greeks = pd.DataFrame(greeks_data)  # Usar pandas para crear el DataFrame
 
     fig_greeks = go.Figure()
     fig_greeks.add_trace(go.Bar(
@@ -1401,11 +1400,6 @@ with tab9:
         yaxis_title="Valor",
         template="plotly_white"
     )
-    st.plotly_chart(fig_greeks, use_container_width=True)
-
-    # Feedback al usuario
-    st.success("¡Explicación completada! Ahora entiendes cómo funciona el Teorema de Black-Scholes.")
-
 
 st.markdown("---")
 st.markdown("""
