@@ -1140,59 +1140,63 @@ with tab8:
         )
         st.plotly_chart(fig_taylor, use_container_width=True)
 
+        # Gráficas de la función original, primera derivada y segunda derivada en una fila
+        st.subheader("📊 Función y Derivadas")
+        col1, col2, col3 = st.columns(3)
+
         # Gráfica de la función original
-        st.subheader("📊 Función Original")
-        fig_original = go.Figure()
-        fig_original.add_trace(go.Scatter(
-            x=x_vals, 
-            y=y_vals, 
-            mode='lines', 
-            name=f"Función: {function_input}", 
-            line=dict(color='blue', width=2)
-        ))
-        fig_original.update_layout(
-            title=f"Función Original: {function_input}",
-            xaxis_title="x",
-            yaxis_title="f(x)",
-            template="plotly_white"
-        )
-        st.plotly_chart(fig_original, use_container_width=True)
+        with col1:
+            fig_original = go.Figure()
+            fig_original.add_trace(go.Scatter(
+                x=x_vals, 
+                y=y_vals, 
+                mode='lines', 
+                name=f"Función: {function_input}", 
+                line=dict(color='blue', width=2)
+            ))
+            fig_original.update_layout(
+                title=f"Función Original: {function_input}",
+                xaxis_title="x",
+                yaxis_title="f(x)",
+                template="plotly_white"
+            )
+            st.plotly_chart(fig_original, use_container_width=True)
 
         # Gráfica de la primera derivada
-        st.subheader("📊 Primera Derivada")
-        fig_prime = go.Figure()
-        fig_prime.add_trace(go.Scatter(
-            x=x_vals, 
-            y=y_prime, 
-            mode='lines', 
-            name=f"Primera Derivada: {sp.latex(f_prime)}", 
-            line=dict(color='purple', width=2)
-        ))
-        fig_prime.update_layout(
-            title=f"Primera Derivada: {sp.latex(f_prime)}",
-            xaxis_title="x",
-            yaxis_title="f'(x)",
-            template="plotly_white"
-        )
-        st.plotly_chart(fig_prime, use_container_width=True)
+        with col2:
+            fig_prime = go.Figure()
+            fig_prime.add_trace(go.Scatter(
+                x=x_vals, 
+                y=y_prime, 
+                mode='lines', 
+                name=f"Primera Derivada: {sp.latex(f_prime)}", 
+                line=dict(color='purple', width=2)
+            ))
+            fig_prime.update_layout(
+                title=f"Primera Derivada: {sp.latex(f_prime)}",
+                xaxis_title="x",
+                yaxis_title="f'(x)",
+                template="plotly_white"
+            )
+            st.plotly_chart(fig_prime, use_container_width=True)
 
         # Gráfica de la segunda derivada
-        st.subheader("📊 Segunda Derivada")
-        fig_double_prime = go.Figure()
-        fig_double_prime.add_trace(go.Scatter(
-            x=x_vals, 
-            y=y_double_prime, 
-            mode='lines', 
-            name=f"Segunda Derivada: {sp.latex(f_double_prime)}", 
-            line=dict(color='orange', width=2)
-        ))
-        fig_double_prime.update_layout(
-            title=f"Segunda Derivada: {sp.latex(f_double_prime)}",
-            xaxis_title="x",
-            yaxis_title="f''(x)",
-            template="plotly_white"
-        )
-        st.plotly_chart(fig_double_prime, use_container_width=True)
+        with col3:
+            fig_double_prime = go.Figure()
+            fig_double_prime.add_trace(go.Scatter(
+                x=x_vals, 
+                y=y_double_prime, 
+                mode='lines', 
+                name=f"Segunda Derivada: {sp.latex(f_double_prime)}", 
+                line=dict(color='orange', width=2)
+            ))
+            fig_double_prime.update_layout(
+                title=f"Segunda Derivada: {sp.latex(f_double_prime)}",
+                xaxis_title="x",
+                yaxis_title="f''(x)",
+                template="plotly_white"
+            )
+            st.plotly_chart(fig_double_prime, use_container_width=True)
 
         # Explicación de subestimación y sobreestimación
         with st.expander("📚 ¿Por qué el polinomio de Taylor subestima o sobreestima?"):
@@ -1208,15 +1212,16 @@ with tab8:
             ### Resumen
             | Condición               | Comportamiento del Polinomio de Taylor |
             |-------------------------|----------------------------------------|
-            | \( Dx > 0 \) y \( f''(x_0) > 0 \) | Subestima la función |
-            | \( Dx < 0 \) y \( f''(x_0) > 0 \) | Sobrestima la función |
+            | \( \Delta x > 0 \) y \( f''(x_0) > 0 \) | Subestima la función |
+            | \( \Delta x < 0 \) y \( f''(x_0) > 0 \) | Sobrestima la función |
             """)
 
         # Feedback al usuario
         st.success("¡Gráfica generada con éxito! Explora cómo el polinomio de Taylor aproxima la función.")
 
     except Exception as e:
-        st.error(f"Error al procesar la función: {e}")        
+        st.error(f"Error al procesar la función: {e}")
+        
 st.markdown("---")
 st.markdown("""
 **Creado por:** Facundo Maleh  
