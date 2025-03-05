@@ -1311,25 +1311,18 @@ with tab9:
 # Explicación del cálculo
 st.markdown("""
 ### 🎯 Explicación del Cálculo
+
 - **Riqueza en el Caso Bueno:**  
-  $$
-  \text{Riqueza}_{\text{bueno}} = \text{Riqueza Inicial} + \text{Ganancia en el Caso Bueno}
-  $$
+  Riqueza_bueno = Riqueza Inicial + Ganancia en el Caso Bueno
 
 - **Riqueza en el Caso Malo:**  
-  $$
-  \text{Riqueza}_{\text{malo}} = \text{Riqueza Inicial} - \text{Pérdida en el Caso Malo}
-  $$
+  Riqueza_malo = Riqueza Inicial - Pérdida en el Caso Malo
 
 - **Ecuación de Prima:**  
-  $$
-  \pi \cdot \ln(\text{Riqueza}_{\text{bueno}}) + (1 - \pi) \cdot \ln(\text{Riqueza}_{\text{malo}}) = \ln(\text{Riqueza} - \text{Prima})
-  $$
+  π * ln(Riqueza_bueno) + (1 - π) * ln(Riqueza_malo) = ln(Riqueza - Prima)
 
 - **Prima Calculada:**  
-  $$
-  \text{Prima} = \text{Riqueza Inicial} - e^{\text{Lado Izquierdo}}
-  $$
+  Prima = Riqueza Inicial - e^(Lado Izquierdo)
 """)
 
 
