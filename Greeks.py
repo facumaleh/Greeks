@@ -42,7 +42,7 @@ st.markdown("""
 st.title("Enjoy Finance 📊")
 
 # Menú de navegación con pestañas
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8  = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9  = st.tabs([
     "1️⃣ Aproximación de Taylor", 
     "2️⃣ Árbol Binomial", 
     "3️⃣ Black-Scholes", 
@@ -50,7 +50,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8  = st.tabs([
     "5️⃣ Optimización con Lagrange",
     "6️⃣ Paridad Put-Call",
     "7️⃣ Simulación de Monte Carlo para Opciones",
-    "8️⃣ Explicación Gráfica de Taylor"
+    "8️⃣ Explicación Gráfica de Taylor",
+    "9️⃣ uncertainty y prima"
 ])
 
 # Página de Aproximación de Taylor
@@ -1229,6 +1230,94 @@ with tab8:
 
     except Exception as e:
         st.error(f"Error al procesar la función: {e}")
+
+# Agregar una nueva pestaña para el cálculo de la prima
+with tab9:
+    st.title("💰 Cálculo de Prima")
+
+    # Descripción del cálculo de la prima
+    with st.expander("📚 ¿Qué es el Cálculo de Prima?"):
+        st.markdown("""
+        **Cálculo de Prima:**
+        - La prima es el costo asociado a un seguro o cobertura.
+        - En este caso, se utiliza la siguiente ecuación para calcular la prima:
+          \[
+          \pi \cdot \ln(\text{Riqueza}_{\text{bueno}}) + (1 - \pi) \cdot \ln(\text{Riqueza}_{\text{malo}}) = \ln(\text{Riqueza} - \text{Prima})
+          \]
+          Donde:
+          - \(\pi\): Probabilidad del caso bueno.
+          - \(\text{Riqueza}_{\text{bueno}}\): Riqueza en el caso bueno.
+          - \(\text{Riqueza}_{\text{malo}}\): Riqueza en el caso malo.
+          - \(\text{Riqueza}\): Riqueza inicial.
+          - \(\text{Prima}\): Prima a calcular.
+        """)
+
+    # Entrada de parámetros
+    st.header("⚙️ Parámetros del Cálculo")
+    col1, col2 = st.columns(2)
+    with col1:
+        riqueza_inicial = st.number_input(
+            "Riqueza Inicial", 
+            value=100.0, 
+            min_value=0.01, 
+            key="prima_riqueza_inicial",
+            help="Riqueza inicial del individuo."
+        )
+        ganancia_bueno = st.number_input(
+            "Ganancia en el Caso Bueno", 
+            value=20.0, 
+            min_value=0.0, 
+            key="prima_ganancia_bueno",
+            help="Ganancia en el caso bueno."
+        )
+    with col2:
+        perdida_malo = st.number_input(
+            "Pérdida en el Caso Malo", 
+            value=30.0, 
+            min_value=0.0, 
+            key="prima_perdida_malo",
+            help="Pérdida en el caso malo."
+        )
+        pi = st.number_input(
+            "Probabilidad del Caso Bueno (\(\pi\))", 
+            value=0.6, 
+            min_value=0.0, 
+            max_value=1.0, 
+            key="prima_pi",
+            help="Probabilidad del caso bueno."
+        )
+
+    # Función para calcular la prima
+    def calcular_prima(riqueza_inicial, ganancia_bueno, perdida_malo, pi):
+        # Calcular riqueza en el caso bueno y malo
+        riqueza_bueno = riqueza_inicial + ganancia_bueno
+        riqueza_malo = riqueza_inicial - perdida_malo
+
+        # Calcular el lado izquierdo de la ecuación
+        lado_izquierdo = pi * np.log(riqueza_bueno) + (1 - pi) * np.log(riqueza_malo)
+
+        # Resolver para la prima
+        prima = riqueza_inicial - np.exp(lado_izquierdo)
+
+        return prima
+
+    # Calcular la prima
+    prima = calcular_prima(riqueza_inicial, ganancia_bueno, perdida_malo, pi)
+
+    # Mostrar el resultado
+    st.subheader("💵 Resultado del Cálculo")
+    st.markdown(f"**Valor de la Prima:** `{prima:.4f}`")
+
+    # Explicación del cálculo
+    st.markdown("""
+    ### 🎯 Explicación del Cálculo
+    - **Riqueza en el Caso Bueno:** \( \text{Riqueza}_{\text{bueno}} = \text{Riqueza Inicial} + \text{Ganancia en el Caso Bueno} \)
+    - **Riqueza en el Caso Malo:** \( \text{Riqueza}_{\text{malo}} = \text{Riqueza Inicial} - \text{Pérdida en el Caso Malo} \)
+    - **Ecuación de Prima:** \( \pi \cdot \ln(\text{Riqueza}_{\text{bueno}}) + (1 - \pi) \cdot \ln(\text{Riqueza}_{\text{malo}}) = \ln(\text{Riqueza} - \text{Prima}) \)
+    - **Prima Calculada:** \( \text{Prima} = \text{Riqueza Inicial} - e^{\text{Lado Izquierdo}} \)
+    """)
+
+
 
 
 st.markdown("---")
