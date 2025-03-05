@@ -1308,15 +1308,29 @@ with tab9:
     st.subheader("💵 Resultado del Cálculo")
     st.markdown(f"**Valor de la Prima:** `{prima:.4f}`")
 
-    # Explicación del cálculo
-    st.markdown("""
-    ### 🎯 Explicación del Cálculo
-    - **Riqueza en el Caso Bueno:** \( \text{Riqueza}_{\text{bueno}} = \text{Riqueza Inicial} + \text{Ganancia en el Caso Bueno} \)
-    - **Riqueza en el Caso Malo:** \( \text{Riqueza}_{\text{malo}} = \text{Riqueza Inicial} - \text{Pérdida en el Caso Malo} \)
-    - **Ecuación de Prima:** \( \pi \cdot \ln(\text{Riqueza}_{\text{bueno}}) + (1 - \pi) \cdot \ln(\text{Riqueza}_{\text{malo}}) = \ln(\text{Riqueza} - \text{Prima}) \)
-    - **Prima Calculada:** \( \text{Prima} = \text{Riqueza Inicial} - e^{\text{Lado Izquierdo}} \)
-    """)
+   # Explicación del cálculo
+st.markdown("""
+### 🎯 Explicación del Cálculo
+- **Riqueza en el Caso Bueno:**  
+  $$
+  \text{Riqueza}_{\text{bueno}} = \text{Riqueza Inicial} + \text{Ganancia en el Caso Bueno}
+  $$
 
+- **Riqueza en el Caso Malo:**  
+  $$
+  \text{Riqueza}_{\text{malo}} = \text{Riqueza Inicial} - \text{Pérdida en el Caso Malo}
+  $$
+
+- **Ecuación de Prima:**  
+  $$
+  \pi \cdot \ln(\text{Riqueza}_{\text{bueno}}) + (1 - \pi) \cdot \ln(\text{Riqueza}_{\text{malo}}) = \ln(\text{Riqueza} - \text{Prima})
+  $$
+
+- **Prima Calculada:**  
+  $$
+  \text{Prima} = \text{Riqueza Inicial} - e^{\text{Lado Izquierdo}}
+  $$
+""")
 
 
 
