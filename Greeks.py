@@ -1308,7 +1308,7 @@ with tab9:
     st.subheader("💵 Resultado del Cálculo")
     st.markdown(f"**Valor de la Prima:** `{prima:.4f}`")
 
-   # Explicación del cálculo
+# Explicación del cálculo
 st.markdown("""
 ### 🎯 Explicación del Cálculo
 - **Riqueza en el Caso Bueno:**  
@@ -1331,7 +1331,6 @@ st.markdown("""
   \text{Prima} = \text{Riqueza Inicial} - e^{\text{Lado Izquierdo}}
   $$
 """)
-
 
 
 st.markdown("---")
