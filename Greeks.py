@@ -1308,22 +1308,22 @@ with tab9:
     st.subheader("💵 Resultado del Cálculo")
     st.markdown(f"**Valor de la Prima:** `{prima:.4f}`")
 
-# Explicación del cálculo
-st.markdown("""
-### 🎯 Explicación del Cálculo
-
-- **Riqueza en el Caso Bueno:**  
-  Riqueza_bueno = Riqueza Inicial + Ganancia en el Caso Bueno
-
-- **Riqueza en el Caso Malo:**  
-  Riqueza_malo = Riqueza Inicial - Pérdida en el Caso Malo
-
-- **Ecuación de Prima:**  
-  π * ln(Riqueza_bueno) + (1 - π) * ln(Riqueza_malo) = ln(Riqueza - Prima)
-
-- **Prima Calculada:**  
-  Prima = Riqueza Inicial - e^(Lado Izquierdo)
-""")
+    # Explicación del cálculo
+    st.markdown("""
+    ### 🎯 Explicación del Cálculo
+    
+    - **Riqueza en el Caso Bueno:**  
+      Riqueza_bueno = Riqueza Inicial + Ganancia en el Caso Bueno
+    
+    - **Riqueza en el Caso Malo:**  
+      Riqueza_malo = Riqueza Inicial - Pérdida en el Caso Malo
+    
+    - **Ecuación de Prima:**  
+      π * ln(Riqueza_bueno) + (1 - π) * ln(Riqueza_malo) = ln(Riqueza - Prima)
+    
+    - **Prima Calculada:**  
+      Prima = Riqueza Inicial - e^(Lado Izquierdo)
+    """)
 
 
 st.markdown("---")
