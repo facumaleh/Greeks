@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt
-import networkx as nx
+import plotly.graph_objects as go
 
 # Page Configuration
 st.set_page_config(
@@ -96,38 +95,48 @@ def binomial_tree_call(S, K, U, D, R, periods):
 # Calculate Binomial Tree
 asset_prices, option_prices, deltas, debts = binomial_tree_call(S, K, U, D, R, periods)
 
-# Improved Visualization Function
-def plot_binomial_tree(values, title, ax, color="blue"):
-    G = nx.Graph()
-    pos = {}
-    labels = {}
+# Function to create a Plotly tree
+def create_plotly_tree(values, title, color="blue"):
+    fig = go.Figure()
     for i in range(values.shape[0]):
         for j in range(i + 1):
-            node = (i, j)
-            G.add_node(node)
-            pos[node] = (i, -j + i / 2)  # Adjust vertical position
-            labels[node] = f"{values[i, j]:.2f}"
+            # Add nodes
+            fig.add_trace(go.Scatter(
+                x=[i], y=[j - i / 2],
+                mode="markers+text",
+                marker=dict(size=20, color=color),
+                text=[f"{values[i, j]:.2f}"],
+                textposition="middle center",
+                name=f"Node ({i}, {j})"
+            ))
+            # Add edges
             if i > 0:
-                parent = (i - 1, j) if j < i else (i - 1, j - 1)
-                G.add_edge(parent, node)
-
-    nx.draw(G, pos, labels=labels, with_labels=True, node_size=2000, node_color=color, font_size=10, font_weight="bold", ax=ax, edge_color="gray", width=1.5)
-    ax.set_title(title, fontsize=14, fontweight="bold")
-    ax.set_facecolor("#f7f7f7")  # Light gray background
-    ax.grid(False)  # Disable grid
+                parent_j = j if j < i else j - 1
+                fig.add_trace(go.Scatter(
+                    x=[i - 1, i], y=[parent_j - (i - 1) / 2, j - i / 2],
+                    mode="lines",
+                    line=dict(color="gray", width=2),
+                    hoverinfo="none"
+                ))
+    fig.update_layout(
+        title=title,
+        showlegend=False,
+        xaxis=dict(showgrid=False, zeroline=False, visible=False),
+        yaxis=dict(showgrid=False, zeroline=False, visible=False),
+        plot_bgcolor="#f7f7f7",
+        margin=dict(l=20, r=20, t=40, b=20)
+    )
+    return fig
 
 # Display Binomial Trees
 st.subheader("📊 Binomial Trees")
-fig, axs = plt.subplots(2, 2, figsize=(14, 10))
-fig.suptitle("Binomial Trees", fontsize=16, fontweight="bold")
-
-plot_binomial_tree(asset_prices, "Asset Price Tree", axs[0, 0], color="#1f77b4")
-plot_binomial_tree(option_prices, "Option Price Tree", axs[0, 1], color="#ff7f0e")
-plot_binomial_tree(deltas, "Delta (Δ) Tree", axs[1, 0], color="#2ca02c")
-plot_binomial_tree(debts, "Debt (B) Tree", axs[1, 1], color="#d62728")
-
-plt.tight_layout()
-st.pyplot(fig)
+col1, col2 = st.columns(2)
+with col1:
+    st.plotly_chart(create_plotly_tree(asset_prices, "Asset Price Tree", color="#1f77b4"), use_container_width=True)
+    st.plotly_chart(create_plotly_tree(option_prices, "Option Price Tree", color="#ff7f0e"), use_container_width=True)
+with col2:
+    st.plotly_chart(create_plotly_tree(deltas, "Delta (Δ) Tree", color="#2ca02c"), use_container_width=True)
+    st.plotly_chart(create_plotly_tree(debts, "Debt (B) Tree", color="#d62728"), use_container_width=True)
 
 # Display Final Option Price
 st.markdown(f"**Call Option Price:** `{option_prices[0, 0]:.4f}`")
