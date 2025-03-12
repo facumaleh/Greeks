@@ -486,7 +486,7 @@ with tab3:
         st.metric("ρ Rho", f"{rho:.4f}")
 
 # Página de Expansión de Taylor para Call
-with tab4:
+    with tab4:
     st.title("📉 Expansión de Taylor para una Opción Call")
 
     # Descripción de la expansión de Taylor
@@ -578,6 +578,10 @@ with tab4:
     # Calcular el precio real de la opción call para el rango de precios
     call_prices = [black_scholes_call(S, K, T, r, sigma) for S in S_range]
 
+    # Calcular Delta y Gamma para el rango de precios
+    delta_values = [delta_call(S, K, T, r, sigma) for S in S_range]
+    gamma_values = [gamma_call(S, K, T, r, sigma) for S in S_range]
+
     # Mostrar las ecuaciones de la expansión de Taylor
     with st.expander("📝 Ecuaciones de la Expansión de Taylor"):
         # Aproximación de Primer Grado (Lineal)
@@ -646,12 +650,61 @@ with tab4:
     # Mostrar la gráfica
     st.plotly_chart(fig, use_container_width=True)
 
+    # Gráfico de Delta
+    st.subheader("📊 Gráfica de Delta (Δ)")
+    fig_delta = go.Figure()
+    fig_delta.add_trace(go.Scatter(
+        x=S_range,
+        y=delta_values,
+        mode='lines',
+        name='Delta (Δ)',
+        line=dict(color='purple', width=2)
+    ))
+    fig_delta.add_vline(
+        x=S0,
+        line=dict(color='gray', dash='dot'),
+        annotation_text=f"S₀ = {S0}",
+        annotation_position="top right"
+    )
+    fig_delta.update_layout(
+        title="Delta (Δ) de una Opción Call",
+        xaxis_title="Precio del Activo (S)",
+        yaxis_title="Delta (Δ)",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_delta, use_container_width=True)
+
+    # Gráfico de Gamma
+    st.subheader("📊 Gráfica de Gamma (Γ)")
+    fig_gamma = go.Figure()
+    fig_gamma.add_trace(go.Scatter(
+        x=S_range,
+        y=gamma_values,
+        mode='lines',
+        name='Gamma (Γ)',
+        line=dict(color='orange', width=2)
+    ))
+    fig_gamma.add_vline(
+        x=S0,
+        line=dict(color='gray', dash='dot'),
+        annotation_text=f"S₀ = {S0}",
+        annotation_position="top right"
+    )
+    fig_gamma.update_layout(
+        title="Gamma (Γ) de una Opción Call",
+        xaxis_title="Precio del Activo (S)",
+        yaxis_title="Gamma (Γ)",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_gamma, use_container_width=True)
+
     # Explicación de las áreas
     st.markdown("""
     ### 🎯 Áreas de Subestimación y Sobrestimación
     - **Áreas en rojo claro:** Indican donde el polinomio de Taylor **subestima** el precio real de la opción.
     - **Áreas en verde claro:** Indican donde el polinomio de Taylor **sobrestima** el precio real de la opción.
-    """)    # Página de Optimización con Lagrange
+    """)   
+    # Página de Optimización con Lagrange
     with tab5:
         st.title("🔍 Optimización con Método de Lagrange")
     
