@@ -489,7 +489,7 @@ with tab3:
 with tab4:
     st.title("📉 Expansión de Taylor para una Opción Call")
 
-    # Descripción de la expansión de Taylor aplicada a una opción call
+    # Descripción de la expansión de Taylor
     with st.expander("📚 ¿Qué es la Expansión de Taylor para una Opción Call?"):
         st.markdown("""
         **Expansión de Taylor para una Opción Call:**
@@ -498,7 +498,7 @@ with tab4:
         - Aquí se calcula la expansión de Taylor de primer y segundo orden.
         """)
 
-    # Controles para los parámetros de la opción (siempre visibles)
+    # Controles para los parámetros de la opción
     st.header("⚙️ Parámetros de la Opción")
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -539,18 +539,19 @@ with tab4:
             key="taylor_sigma"
         )
 
-    # Calcular el precio de la opción call usando Black-Scholes
+    # Función para calcular el precio de la opción call usando Black-Scholes
     def black_scholes_call(S, K, T, r, sigma):
         d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
         d2 = d1 - sigma * np.sqrt(T)
         call_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
         return call_price
 
-    # Calcular las derivadas (Griegas) necesarias para la expansión de Taylor
+    # Función para calcular Delta
     def delta_call(S, K, T, r, sigma):
         d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
         return norm.cdf(d1)
 
+    # Función para calcular Gamma
     def gamma_call(S, K, T, r, sigma):
         d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
         return norm.pdf(d1) / (S * sigma * np.sqrt(T))
@@ -577,7 +578,7 @@ with tab4:
     # Calcular el precio real de la opción call para el rango de precios
     call_prices = [black_scholes_call(S, K, T, r, sigma) for S in S_range]
 
-    # Mostrar las ecuaciones de la expansión de Taylor dentro de un expander
+    # Mostrar las ecuaciones de la expansión de Taylor
     with st.expander("📝 Ecuaciones de la Expansión de Taylor"):
         # Aproximación de Primer Grado (Lineal)
         st.markdown("**Aproximación de Primer Grado (Lineal):**")
@@ -591,7 +592,7 @@ with tab4:
         C(S) \approx C(S_0) + \Delta(S_0) \cdot (S - S_0) + \frac{1}{2} \Gamma(S_0) \cdot (S - S_0)^2
         """)
 
-    # Graficar la expansión de Taylor y el precio real de la opción (siempre visible)
+    # Graficar la expansión de Taylor y el precio real de la opción
     st.subheader("📊 Gráfica de la Expansión de Taylor")
 
     # Crear la figura con Plotly
@@ -624,47 +625,6 @@ with tab4:
         line=dict(color='red', dash='dash', width=2)
     ))
 
-    # Resaltar áreas donde el polinomio subestima o sobreestima
-    fig.add_trace(go.Scatter(
-        x=S_range,
-        y=np.minimum(call_prices, taylor_1_values),  # Área donde Taylor 1 subestima
-        fill='tonexty',
-        mode='none',
-        name='Taylor 1 Subestima',
-        fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
-        showlegend=False
-    ))
-
-    fig.add_trace(go.Scatter(
-        x=S_range,
-        y=np.maximum(call_prices, taylor_1_values),  # Área donde Taylor 1 sobreestima
-        fill='tonexty',
-        mode='none',
-        name='Taylor 1 Sobrestima',
-        fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
-        showlegend=False
-    ))
-
-    fig.add_trace(go.Scatter(
-        x=S_range,
-        y=np.minimum(call_prices, taylor_2_values),  # Área donde Taylor 2 subestima
-        fill='tonexty',
-        mode='none',
-        name='Taylor 2 Subestima',
-        fillcolor='rgba(255, 0, 0, 0.1)',  # Rojo claro
-        showlegend=False
-    ))
-
-    fig.add_trace(go.Scatter(
-        x=S_range,
-        y=np.maximum(call_prices, taylor_2_values),  # Área donde Taylor 2 sobreestima
-        fill='tonexty',
-        mode='none',
-        name='Taylor 2 Sobrestima',
-        fillcolor='rgba(0, 255, 0, 0.1)',  # Verde claro
-        showlegend=False
-    ))
-
     # Línea vertical en el punto de expansión (S₀)
     fig.add_vline(
         x=S0,
@@ -691,9 +651,7 @@ with tab4:
     ### 🎯 Áreas de Subestimación y Sobrestimación
     - **Áreas en rojo claro:** Indican donde el polinomio de Taylor **subestima** el precio real de la opción.
     - **Áreas en verde claro:** Indican donde el polinomio de Taylor **sobrestima** el precio real de la opción.
-    """)
-
-    # Página de Optimización con Lagrange
+    """)    # Página de Optimización con Lagrange
     with tab5:
         st.title("🔍 Optimización con Método de Lagrange")
     
